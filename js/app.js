@@ -32,25 +32,38 @@ const totalDays = getDaysInMonth(currentYear, currentMonth);
 console.log(`今月の1日の曜日番号: ${firstDayNum}`);
 console.log(`今月の総日数: ${totalDays}日間`);
 
+// 4. カレンダーを画面に描画（レンダリング）する関数
 function renderCalendar(year, month) {
+    // HTML側にある「カレンダーの受け皿」をJSの中に引っ張ってくる
     const container = document.getElementById("calendar-container");
+
+    // 描画する前に、中身を一度完全に空っぽ（リセット）にする
+    // 「来月」や「先月」のボタンを押したときに、前の月のカレンダーの上に新しいカレンダーがどんどん重なって追記されてしまうのを防ぐ
     container.innerHTML = "";
-    const firstDayIndex = getFirstDayOfWeek(year,month);
-    const totalDays = getDaysInMonth(year,month);
+
+    const firstDayIndex = getFirstDayOfWeek(year, month); // 1日の曜日番号(0〜6)
+    const totalDays = getDaysInMonth(year, month); // 今月の総日数(1〜31)
+
+    // 手順１.月曜始まりにするための「空白のマス」の数を計算する
+    // ここが今回一番面白いかった。日曜日始まりから月曜日始まりへ、曜日のインデックスをずらす計算式
     const emptyDaysCount = (firstDayIndex + 6) % 7;
 
-    for (let i =0; i < emptyDaysCount; i++){
-        const emptySlot = document.createElement("div");
-        emptySlot.classList.add("calendar-day", "empty");
-        container.appendChild(emptySlot);
+    // 計算された数だけ、中身が空っぽの <div> をループで生成して敷き詰める
+    for (let i = 0; i < emptyDaysCount; i++) {
+    const emptySlot = document.createElement("div");
+    emptySlot.classList.add("calendar-day", "empty"); // 空白用の目印クラスをつける。まとめて記述できるみたい。
+    container.appendChild(emptySlot); // 器の中に追加する
     }
 
-    for (let day = 1; day <= totalDays; day++){
+    // 手順2.1日から最終日までの「日付のマス」をループで生成して敷き詰める
+    for (let day = 1; day <= totalDays; day++) {
         const daySlot = document.createElement("div");
-        daySlot.classList.add("calendar-day");
-        daySlot.textContent = day;
-        container.appendChild(daySlot);
-    }
+        daySlot.classList.add("calendar-day"); // マス目共通のクラスをつける
+        daySlot.textContent = day; // マスの中に日付の数字を入れる
+        container.appendChild(daySlot); // 器の中に追加する
+
+    }   
 }
 
-renderCalendar(currentYear,currentMonth);
+    // 5. アプリ起動時に、今月のカレンダーを描画するように命令
+    renderCalendar(currentYear, currentMonth); 
