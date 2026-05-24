@@ -1,0 +1,1 @@
+console.log("Medi-log: JavaScript linked successfully.");
