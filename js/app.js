@@ -51,6 +51,7 @@ function renderCalendar(year, month) {
     // 計算された数だけ、中身が空っぽの <div> をループで生成して敷き詰める
     for (let i = 0; i < emptyDaysCount; i++) {
     const emptySlot = document.createElement("div");
+    // container.innerHTML += `<div class="calendar-day">${day}</div>`;こういう書き方でも大丈夫みたい。
     emptySlot.classList.add("calendar-day", "empty"); // 空白用の目印クラスをつける。まとめて記述できるみたい。
     container.appendChild(emptySlot); // 器の中に追加する
     }

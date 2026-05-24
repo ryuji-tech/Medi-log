@@ -1,4 +1,31 @@
-body {
-    background-color: #f9f9f9;
+/* body { */
+    /* background-color: #f9f9f9; */
+/* } */
+
+/* カレンダー全体の器を7列のグリッドにする */
+#calendar-container {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr); /* 7列に均等に分ける repeat(7, ...) ＝ 「7回繰り返して並べる」という意味。1fr ＝ fr は「Fraction（比率・分数）」の略で、利用可能な横幅を均等に「1つ分の比率」で分け合うという意味*/
+  gap: 8px;                             /* マスとマスの隙間 */
+  max-width: 400px;                     /* カレンダー全体の横幅の限界 */
+  margin: 20px auto;                    /* 画面の真ん中に寄せる Webデザインの定番の配置テクニックらしい*/
 }
 
+/* 1個1個のマス目（日付・空白共通）のデザイン */
+.calendar-day {
+  aspect-ratio: 1 / 1;                  /* 縦横比を「1:1」の綺麗な正方形にする。スマホやパソコンなど画面の横幅が変わってマスの横幅が伸縮しても、縦幅も自動で同じだけ伸縮し、常に綺麗な正方形をキープ */
+  isplay: flex;                        /* flexbox王道３セット。チーズでも活用したやつ */
+  align-items: center;                  /* 数字を上下の真ん中に配置 */
+  justify-content: center;               /* 数字を左右の真ん中に配置 */
+  background-color: #ffffff;            /* マスの背景は白 */
+  border: 1px solid #e0e0e0;            /* 優しいグレーの枠線 */
+  border-radius: 4px;                   /* 角をちょっとだけ丸くする */
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* 空白のマス（emptyクラスがついている箱）だけのデザイン マルチクラス指定にて空白ますだけの色変えを行った*/
+.calendar-day.empty {
+  background-color: #f0f0f0;            /* 空白マスは薄いグレーにして区別する */
+  border: 1px dashed #d0d0d0;           /* 枠線を点線にする */
+}
