@@ -31,3 +31,26 @@ const totalDays = getDaysInMonth(currentYear, currentMonth);
 
 console.log(`今月の1日の曜日番号: ${firstDayNum}`);
 console.log(`今月の総日数: ${totalDays}日間`);
+
+function renderCalendar(year, month) {
+    const container = document.getElementById("calendar-container");
+    container.innerHTML = "";
+    const firstDayIndex = getFirstDayOfWeek(year,month);
+    const totalDays = getDaysInMonth(year,month);
+    const emptyDaysCount = (firstDayIndex + 6) % 7;
+
+    for (let i =0; i < emptyDaysCount; i++){
+        const emptySlot = document.createElement("div");
+        emptySlot.classList.add("calendar-day", "empty");
+        container.appendChild(emptySlot);
+    }
+
+    for (let day = 1; day <= totalDays; day++){
+        const daySlot = document.createElement("div");
+        daySlot.classList.add("calendar-day");
+        daySlot.textContent = day;
+        container.appendChild(daySlot);
+    }
+}
+
+renderCalendar(currentYear,currentMonth);
