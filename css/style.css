@@ -1,31 +1,49 @@
-/* body { */
-    /* background-color: #f9f9f9; */
-/* } */
+body {
+  background-color: #fafafa; 
+  background-image: linear-gradient(to bottom, #ffffff 0%, #f5f5f5 100%);
+  background-attachment: fixed;
 
-/* カレンダー全体の器を7列のグリッドにする */
+  /* 👇 1. ページ全体のデフォルトフォントを Noto Sans JP に設定 */
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
 #calendar-container {
   display: grid;
-  grid-template-columns: repeat(7, 1fr); /* 7列に均等に分ける repeat(7, ...) ＝ 「7回繰り返して並べる」という意味。1fr ＝ fr は「Fraction（比率・分数）」の略で、利用可能な横幅を均等に「1つ分の比率」で分け合うという意味*/
-  gap: 8px;                             /* マスとマスの隙間 */
-  max-width: 400px;                     /* カレンダー全体の横幅の限界 */
-  margin: 20px auto;                    /* 画面の真ん中に寄せる Webデザインの定番の配置テクニックらしい*/
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px; /* 触りやすさを考慮して、マス同士の間隔をほんの少し広げました */
+  max-width: 400px;
+  margin: 60px auto;
+  background-color: #ffffff;
+  padding: 28px;
+  border-radius: 4px; /* 外枠の紙の裁断面としてのシャープさはキープ */
+  box-shadow: 
+    0 0 0 1px rgba(0, 0, 0, 0.02),
+    0 1px 3px rgba(0, 0, 0, 0.05),
+    0 10px 30px rgba(0, 0, 0, 0.04);
 }
 
-/* 1個1個のマス目（日付・空白共通）のデザイン */
 .calendar-day {
-  aspect-ratio: 1 / 1;                  /* 縦横比を「1:1」の綺麗な正方形にする。スマホやパソコンなど画面の横幅が変わってマスの横幅が伸縮しても、縦幅も自動で同じだけ伸縮し、常に綺麗な正方形をキープ */
-  isplay: flex;                        /* flexbox王道３セット。チーズでも活用したやつ */
-  align-items: center;                  /* 数字を上下の真ん中に配置 */
-  justify-content: center;               /* 数字を左右の真ん中に配置 */
-  background-color: #ffffff;            /* マスの背景は白 */
-  border: 1px solid #e0e0e0;            /* 優しいグレーの枠線 */
-  border-radius: 4px;                   /* 角をちょっとだけ丸くする */
-  font-size: 14px;
-  font-weight: 500;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  border: 1px solid #e8e8e8; /* 枠線を少しだけ柔らかいトーンに調整 */
+  
+  /* 👇 2. 角を丸めて「押せるボタン（優しさ）」を表現 */
+  border-radius: 8px; /* 2pxから8pxへ変更し、角をコロンと丸くしました */
+  
+  /* 👇 3. Noto Sans JP のフォント設定 */
+  font-size: 16px;       /* 高齢者の方が見やすいよう、文字を1サイズ大きく */
+  font-weight: 500;      /* 数字がハッキリ細すぎずに見える太さ */
+  color: #2c2c2c;        /* 印刷されたインクのような、目に優しいチャコール黒 */
+  
+  /* 押せる雰囲気を出すためのマウスカーソル（ポインタ）設定 */
+  cursor: pointer;
 }
 
-/* 空白のマス（emptyクラスがついている箱）だけのデザイン マルチクラス指定にて空白ますだけの色変えを行った*/
 .calendar-day.empty {
-  background-color: #f0f0f0;            /* 空白マスは薄いグレーにして区別する */
-  border: 1px dashed #d0d0d0;           /* 枠線を点線にする */
+  background-color: #f7f7f7;
+  border: 1px dashed #e8e8e8;
+  cursor: default; /* 空白マスは押せないので、カーソルを通常に戻す */
 }
