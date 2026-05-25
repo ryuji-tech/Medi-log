@@ -47,3 +47,24 @@ body {
   border: 1px dashed #e8e8e8;
   cursor: default; /* 空白マスは押せないので、カーソルを通常に戻す */
 }
+
+/* カレンダーの一番上に並ぶ曜日ヘッダーのデザイン */
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* 曜日文字もマスの真ん中に配置 */
+  font-size: 14px;         /* 日付の数字（16px）よりほんの少し小さくして主役を引き立てる */
+  font-weight: 700;        /* 曜日だとハッキリわかるように太字（ボールド）に */
+  color: #666666;          /* 日付の数字よりも少し薄いグレーにして、全体のメリハリをつける */
+  padding-bottom: 8px;     /* 下の日付マスとの間にほんの少し隙間を作って見やすく */
+}
+
+/* 土曜日（saturdayクラス）の文字色：落ち着いたブルー */
+.calendar-header.saturday {
+  color: #2b6cb0; /* 視認性を保ちつつ、目に優しい知的な青 */
+}
+
+/* 日曜日（sundayクラス）の文字色：優しいレッド */
+.calendar-header.sunday {
+  color: #c53030; /* 警告色になりすぎない、朱色に近い温かみのある赤 */
+}

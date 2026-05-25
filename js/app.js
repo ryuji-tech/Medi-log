@@ -44,6 +44,26 @@ function renderCalendar(year, month) {
     const firstDayIndex = getFirstDayOfWeek(year, month); // 1日の曜日番号(0〜6)
     const totalDays = getDaysInMonth(year, month); // 今月の総日数(1〜31)
 
+    // 手順0.（手順2のあとから足したので0に特に意味はない実質手順3）曜日ヘッダー（月〜日）を生成して敷き詰める
+    // 月曜始まりのカレンダーなので、配列も「月曜日」からスタートさせる
+    const weekdays = ["月", "火", "水", "木", "金", "土", "日"];
+
+    for (let i = 0; i < weekdays.length; i++){
+        const headerSlot = document.createElement("div");
+        
+        headerSlot.classList.add("calendar-header");  /* 曜日マス専用のクラス（calendar-header）を付与して、日付と区別できるようにする */
+        headerSlot.textContent = weekdays[i]; /* 配列から「月」「火」...を順番に取り出して流し込む */
+        
+        // 土日に色が欲しかったのであとから追加した。土曜日（インデックス5）と日曜日（インデックス6）に専用クラスをつける
+        if (i === 5) {
+            headerSlot.classList.add("saturday"); /* 土曜日専用の目印 */
+        } else if (i === 6) {
+            headerSlot.classList.add("sunday"); /* 日曜日専用の目印 */
+        }
+
+        container.appendChild(headerSlot);    /* 器の最前列に追加 */
+    }
+
     // 手順１.月曜始まりにするための「空白のマス」の数を計算する
     // ここが今回一番面白いかった。日曜日始まりから月曜日始まりへ、曜日のインデックスをずらす計算式
     const emptyDaysCount = (firstDayIndex + 6) % 7;
@@ -65,6 +85,5 @@ function renderCalendar(year, month) {
 
     }   
 }
-
     // 5. アプリ起動時に、今月のカレンダーを描画するように命令
     renderCalendar(currentYear, currentMonth); 
