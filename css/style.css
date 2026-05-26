@@ -9,13 +9,13 @@ body {
 
 #calendar-container {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 10px; /* 触りやすさを考慮して、マス同士の間隔をほんの少し広げました */
+  grid-template-columns: repeat(7, 1fr);/* 【魔法の呪文】横幅を完璧に7等分（1週間分）した列を自動で作る */
+  gap: 10px; /* マス同士の間隔 */
   max-width: 400px;
   margin: 60px auto;
   background-color: #ffffff;
   padding: 28px;
-  border-radius: 4px; /* 外枠の紙の裁断面としてのシャープさはキープ */
+  border-radius: 4px; /* 枠の外側の丸み */
   box-shadow: 
     0 0 0 1px rgba(0, 0, 0, 0.02),
     0 1px 3px rgba(0, 0, 0, 0.05),
@@ -31,7 +31,7 @@ body {
   border: 1px solid #e8e8e8; /* 枠線を少しだけ柔らかいトーンに調整 */
   
   /* 👇 2. 角を丸めて「押せるボタン（優しさ）」を表現 */
-  border-radius: 8px; /* 2pxから8pxへ変更し、角をコロンと丸くしました */
+  border-radius: 8px; /* 2pxから8pxへ変更し、角を丸く */
   
   /* 👇 3. Noto Sans JP のフォント設定 */
   font-size: 16px;       /* 高齢者の方が見やすいよう、文字を1サイズ大きく */
@@ -67,4 +67,36 @@ body {
 /* 日曜日（sundayクラス）の文字色：優しいレッド */
 .calendar-header.sunday {
   color: #c53030; /* 警告色になりすぎない、朱色に近い温かみのある赤 */
+}
+
+/* カレンダー全体を包む白いカード（質感と影を担当） */
+.calendar-card {
+  max-width: 400px;
+  margin: 60px auto;
+  background-color: #ffffff; /* 机の上の白い紙 */
+  padding: 28px;
+  border-radius: 4px;
+  
+  /* 多層シャドウ */
+  box-shadow: 
+    0 0 0 1px rgba(0, 0, 0, 0.02),
+    0 1px 3px rgba(0, 0, 0, 0.05),
+    0 10px 30px rgba(0, 0, 0, 0.04);
+}
+
+/* カレンダー上部の操作エリア（中の grid-column 指定を削除） */
+#calendar-header-ui {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 20px;
+  border-bottom: 1px dashed #f0f0f0;
+  margin-bottom: 16px;
+}
+
+/* 日付と曜日が並ぶグリッドエリア（幅や影の設定を card に譲り、純粋なグリッドに） */
+#calendar-container {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px; 
 }

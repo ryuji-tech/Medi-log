@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="css/style.css">
-    
+
 </head>
 <body>
     <!-- アプリ全体のコンテナ -->
@@ -25,9 +25,14 @@
 
         <!-- メインエリア（カレンダーの配置場所） -->
         <main class="app-main">
-            <div id="calendar-container">
-                <!-- idで指定したので後ほど記述注意 -->
-                <!-- ここにカレンダーを入れる予定 -->
+            <div class="calendar-card">
+
+                <div id="calendar-header-ui">
+                    <button id="prev-month-btn">＜</button> <h2 id="calendar-title">2026年 5月</h2>
+                    <button id="next-month-btn">＞</button> </div>    
+
+                <div id="calendar-container"></div>
+                <!-- ここにカレンダーを入れる -->
             </div>
         </main>
         <!-- /.app-main -->
