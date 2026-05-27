@@ -100,3 +100,52 @@ body {
   grid-template-columns: repeat(7, 1fr);
   gap: 10px; 
 }
+
+/* ==========================================================================
+   お薬記録用の引き出し（アコーディオンパネル）
+   ========================================================================== */
+
+.accordion-panel {
+  grid-column: span 7; /* 【重要】カレンダーの7列分をまるごとぶち抜いて横いっぱいに広げる */
+  background-color: #fafafa; /* カレンダーの白と区別するため、ごくわずかにトーンを落とした優しいグレー */
+  border-radius: 6px;
+  border: 1px solid #eef0f2;
+  margin: 4px 0 12px 0; /* 上下のマス目との間にほどよい隙間を作る */
+  
+  /* 👇 ぬるっと開閉させるための超重要設定 */
+  overflow: hidden; /* 中身がはみ出たときに隠す（高さ0のときに中身を隠すため） */
+  max-height: 0; /* 初期状態は高さを「ゼロ」にして完全に閉じておく */
+  opacity: 0; /* 最初は透明 */
+  
+/* 0.2秒かけて、高さと透明度を滑らかに変化させる（イカしたモーションの核） */
+  transition: max-height 0.25s ease-out, opacity 0.2s ease-out, padding 0.25s ease-out;
+  padding: 0 16px; /* 閉じている時は上下の余白を0にする */
+}
+
+/* 👇 JavaScriptによって「.is-open」というクラスがついた瞬間、引き出しがパカッと開く */
+.accordion-panel.is-open {
+  max-height: 240px; /* 引き出しが開いた時の最大の高さ（1日分ならこれで十分足りる） */
+  opacity: 1; /* くっきり表示 */
+  padding: 16px; /* 開いたときに心地よい余白を作る */
+  background-color: #ffffff; /* 開いた時は主役なので、綺麗な白にする */
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.04); /* 内側にほんのり影をつけて「凹んだ引き出し感」を出す */
+}
+
+/* 引き出しの中のタイトル（例：5月26日の記録） */
+.accordion-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #2c2c2c;
+  margin-top: 0;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* 今はまだ仮置き：引き出しの中のお薬チェック用テキスト */
+.accordion-content {
+  font-size: 14px;
+  color: #555555;
+  line-height: 1.6;
+}
