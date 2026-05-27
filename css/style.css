@@ -102,45 +102,40 @@ body {
 }
 
 /* ==========================================================================
-   お薬記録用の引き出し（カレンダー下部ドッキング方式）
+   アコーディオンパネル（週の間がパカッと裂ける）
    ========================================================================== */
 
 .accordion-panel {
-  background-color: #ffffff;
-  /* 上部に dashed（破線）の境界線をつけ、ミシン目で切り取られたノートのような質感に */
-  border-top: 1px dashed #eef0f2; 
-  margin-top: 12px;
+  grid-column: span 7; /* ★ 7列分（1週間分）の横幅を丸ごとぶち抜く */
+  background-color: #fafafa;
+  border-top: 1px dashed #eef0f2;
+  border-bottom: 1px dashed #eef0f2;
   
-  /* ぬるっと開閉させるためのアニメーション設定 */
+  /* ぬるっと縦に裂けるための超重要アニメーション */
   overflow: hidden;
-  max-height: 0; 
+  max-height: 0;
   opacity: 0;
-  transform: translateY(-10px); /* 開くときに、上から下へ少しだけ滑り落ちてくる演出 */
   
-  /* 速度を 0.3秒 にし、ease-out（後半にかけて滑らかに減速）で高級感を出す */
-  transition: max-height 0.3s ease-out, opacity 0.25s ease-out, transform 0.3s ease-out, padding 0.3s ease-out;
-  padding: 0; 
+  /* 0.25秒かけて、縦にパカッと広がる */
+  transition: max-height 0.25s ease-out, opacity 0.2s ease-out, padding 0.25s ease-out;
+  padding: 0 16px;
 }
 
-/* 開いたときの状態 */
+/* パカッと開いたとき */
 .accordion-panel.is-open {
-  max-height: 200px; /* 1日分の要素が綺麗に収まる高さ */
+  max-height: 180px; /* お薬チェックが入るジャストな高さ */
   opacity: 1;
-  transform: translateY(0); /* 元の位置にピタッと収まる */
-  padding-top: 16px; /* 開いたときだけ上部に心地よい余白を作る */
+  padding: 16px;
+  margin-bottom: 8px; /* 下の週のマスとの間に少し余白を作る */
 }
-/* 引き出しの中のタイトル（例：5月26日の記録） */
+
 .accordion-title {
   font-size: 15px;
   font-weight: 700;
   color: #2c2c2c;
   margin-top: 0;
   margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
 }
-
 /* 今はまだ仮置き：引き出しの中のお薬チェック用テキスト */
 .accordion-content {
   font-size: 14px;

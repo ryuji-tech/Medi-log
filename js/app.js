@@ -61,7 +61,7 @@ function renderCalendar(year, month) {
     container.appendChild(emptySlot); 
   }
 
-// 【ステップ2】1日から最終日までの「日付のマス」を生成
+/// 【ステップ2】1日から最終日までの「日付のマス」を生成
   for (let day = 1; day <= totalDays; day++) {
     const daySlot = document.createElement("div");
     daySlot.classList.add("calendar-day"); 
@@ -70,24 +70,47 @@ function renderCalendar(year, month) {
     // 日付マスがクリックされたときの処理
     daySlot.addEventListener("click", () => {
       
-      // カレンダーカードの下部に用意した「固定の引き出し部屋」を取得する
-      const panel = document.getElementById("calendar-accordion-panel");
-      
-      // 一度「開くクラス」を外して、中身をシュッと入れ替える準備をする
-      panel.classList.remove("is-open");
+      // 1. 既存の開いている引き出しがあれば削除
+      const existingPanel = document.querySelector(".accordion-panel");
+      if (existingPanel) {
+        existingPanel.remove();
+      }
 
-      // 引き出しの中身を組み立てる
+      // 2. 新しい引き出し要素を作成
+      const panel = document.createElement("div");
+      panel.classList.add("accordion-panel");
       panel.innerHTML = `
         <h3 class="accordion-title">💊 ${month}月${day}日（${weekdays[(firstDayIndex + day - 2 + 7) % 7]}）のお薬記録</h3>
         <div class="accordion-content">
-          <p>⏳ ここに朝・昼・晩のお薬チェックボックスが並びます（次のステップで実装！）</p>
+          <p>⏳ ここに朝・昼・晩のお薬チェックボックスが並ぶ</p>
         </div>
       `;
 
-      // ほんの一瞬だけ待ってから、ぬるっと開くクラスを付与する
+      // 3. ★【重要ロジック】クリックされた日の「その週の土曜日（右端）」のマスを探し出す
+      // 空白マスの数（firstDayIndex）と今日の日付から、グリッド上の位置を計算
+      const currentGridIndex = firstDayIndex + day - 1; 
+      const daysUntilSaturday = 6 - (currentGridIndex % 7); // 土曜日（インデックス6）までの残り日数
+      const targetDay = day + daysUntilSaturday; // 同じ週の土曜日の日付
+      
+      // もし土曜日が当月の最終日を超えてしまったら、当月の最終日のマスの後ろに挿入する
+      const finalInsertionDay = Math.min(targetDay, totalDays);
+
+      // カレンダーの中から、挿入先となるマスの要素を特定する
+      // (container.children の中から、インデックスを逆算してターゲットを見つけます)
+      const targetSlotIndex = firstDayIndex + finalInsertionDay - 1;
+      const targetSlot = container.children[targetSlotIndex];
+
+      // 4. その週の右端マスのすぐ後ろに引き出しを滑り込ませる！
+      if (targetSlot) {
+        container.insertBefore(panel, targetSlot.nextSibling);
+      } else {
+        container.appendChild(panel);
+      }
+
+      // 5. 0.01秒後にぬるっと展開
       setTimeout(() => {
         panel.classList.add("is-open");
-      }, 50);
+      }, 10);
     });
 
     container.appendChild(daySlot);        
