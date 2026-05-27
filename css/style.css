@@ -102,35 +102,33 @@ body {
 }
 
 /* ==========================================================================
-   お薬記録用の引き出し（アコーディオンパネル）
+   お薬記録用の引き出し（カレンダー下部ドッキング方式）
    ========================================================================== */
 
 .accordion-panel {
-  grid-column: span 7; /* 【重要】カレンダーの7列分をまるごとぶち抜いて横いっぱいに広げる */
-  background-color: #fafafa; /* カレンダーの白と区別するため、ごくわずかにトーンを落とした優しいグレー */
-  border-radius: 6px;
-  border: 1px solid #eef0f2;
-  margin: 4px 0 12px 0; /* 上下のマス目との間にほどよい隙間を作る */
+  background-color: #ffffff;
+  /* 上部に dashed（破線）の境界線をつけ、ミシン目で切り取られたノートのような質感に */
+  border-top: 1px dashed #eef0f2; 
+  margin-top: 12px;
   
-  /* 👇 ぬるっと開閉させるための超重要設定 */
-  overflow: hidden; /* 中身がはみ出たときに隠す（高さ0のときに中身を隠すため） */
-  max-height: 0; /* 初期状態は高さを「ゼロ」にして完全に閉じておく */
-  opacity: 0; /* 最初は透明 */
+  /* ぬるっと開閉させるためのアニメーション設定 */
+  overflow: hidden;
+  max-height: 0; 
+  opacity: 0;
+  transform: translateY(-10px); /* 開くときに、上から下へ少しだけ滑り落ちてくる演出 */
   
-/* 0.2秒かけて、高さと透明度を滑らかに変化させる（イカしたモーションの核） */
-  transition: max-height 0.25s ease-out, opacity 0.2s ease-out, padding 0.25s ease-out;
-  padding: 0 16px; /* 閉じている時は上下の余白を0にする */
+  /* 速度を 0.3秒 にし、ease-out（後半にかけて滑らかに減速）で高級感を出す */
+  transition: max-height 0.3s ease-out, opacity 0.25s ease-out, transform 0.3s ease-out, padding 0.3s ease-out;
+  padding: 0; 
 }
 
-/* 👇 JavaScriptによって「.is-open」というクラスがついた瞬間、引き出しがパカッと開く */
+/* 開いたときの状態 */
 .accordion-panel.is-open {
-  max-height: 240px; /* 引き出しが開いた時の最大の高さ（1日分ならこれで十分足りる） */
-  opacity: 1; /* くっきり表示 */
-  padding: 16px; /* 開いたときに心地よい余白を作る */
-  background-color: #ffffff; /* 開いた時は主役なので、綺麗な白にする */
-  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.04); /* 内側にほんのり影をつけて「凹んだ引き出し感」を出す */
+  max-height: 200px; /* 1日分の要素が綺麗に収まる高さ */
+  opacity: 1;
+  transform: translateY(0); /* 元の位置にピタッと収まる */
+  padding-top: 16px; /* 開いたときだけ上部に心地よい余白を作る */
 }
-
 /* 引き出しの中のタイトル（例：5月26日の記録） */
 .accordion-title {
   font-size: 15px;

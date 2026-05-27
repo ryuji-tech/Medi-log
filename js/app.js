@@ -70,35 +70,24 @@ function renderCalendar(year, month) {
     // 日付マスがクリックされたときの処理
     daySlot.addEventListener("click", () => {
       
-      // 1. すでに画面に開いている古い引き出し（パネル）がないか探す
-      const existingPanel = document.querySelector(".accordion-panel");
+      // カレンダーカードの下部に用意した「固定の引き出し部屋」を取得する
+      const panel = document.getElementById("calendar-accordion-panel");
       
-      // 2. もし古い引き出しが存在していたら、一旦画面から完全に削除する
-      if (existingPanel) {
-        existingPanel.remove();
-      }
+      // 一度「開くクラス」を外して、中身をシュッと入れ替える準備をする
+      panel.classList.remove("is-open");
 
-      // 3. 新しい引き出し（アコーディオンパネル）の要素をゼロから生成する
-      const panel = document.createElement("div");
-      panel.classList.add("accordion-panel"); // CSSでデザインしたクラスを付与
-
-      // 4. 引き出しの中身（HTML）を組み立てる
+      // 引き出しの中身を組み立てる
       panel.innerHTML = `
         <h3 class="accordion-title">💊 ${month}月${day}日（${weekdays[(firstDayIndex + day - 2 + 7) % 7]}）のお薬記録</h3>
         <div class="accordion-content">
-          <p>⏳ ここに朝・昼・晩のお薬チェックボックスが並部予定。後で実装</p>
+          <p>⏳ ここに朝・昼・晩のお薬チェックボックスが並びます（次のステップで実装！）</p>
         </div>
       `;
 
-      // 5. クリックされた日付マスの「すぐ後ろ（次の要素）」として引き出しを挿入する
-      // ※ insertBefore と nextSibling を組み合わせることで、「直後に差し込む」定石
-      daySlot.parentNode.insertBefore(panel, daySlot.nextSibling);
-
-      // 6. 挿入した直後に、0.01秒だけ遅らせて「.is-open」クラスを付与する
-      // ※ ブラウザに「要素が生まれた事実」を認識させてからクラスを変えることで、CSSのアニメーションを発動させる
+      // ほんの一瞬だけ待ってから、ぬるっと開くクラスを付与する
       setTimeout(() => {
         panel.classList.add("is-open");
-      }, 10);
+      }, 50);
     });
 
     container.appendChild(daySlot);        
