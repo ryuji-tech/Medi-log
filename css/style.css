@@ -23,7 +23,7 @@ body {
    ========================================================================== */
 
 .calendar-card {
-  position: relative; /* 子要素の浮遊ボタンの基準点となるようrelative化 */
+  position: relative; 
   max-width: 400px;
   margin: 60px auto;
   background-color: #ffffff;
@@ -69,15 +69,14 @@ body {
   background-color: #f5f5f5;
 }
 
-/* ✨【新設計】右下にオーバーレイで美しく浮かぶ（＋）ボタン */
 #floating-register-btn {
   position: absolute;
-  bottom: -20px;  /* 31日のマスの右下、カレンダーカードの枠線上に絶妙に重なる配置 */
+  bottom: -20px;  
   right: 20px;
   width: 56px;
   height: 56px;
-  border-radius: 50%; /* 完璧な真ん丸 */
-  background-color: #2c2c2c; /* 高級感があり目に優しいチャコール黒 */
+  border-radius: 50%; 
+  background-color: #2c2c2c; 
   color: #ffffff;
   font-size: 28px;
   font-weight: 400;
@@ -88,17 +87,15 @@ body {
   justify-content: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
-  z-index: 10; /* カレンダーのマスよりも確実に手前に浮かす */
+  z-index: 10; 
 }
-
 #floating-register-btn:hover {
   background-color: #444444;
-  transform: translateY(-2px); /* ホバー時にわずかに浮かび上がる浮遊感 */
+  transform: translateY(-2px); 
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
-
 #floating-register-btn:active {
-  transform: translateY(1px) scale(0.95); /* 押し込んだ時の肉体的な手応え */
+  transform: translateY(1px) scale(0.95); 
 }
 
 /* ==========================================================================
@@ -154,6 +151,7 @@ body {
 }
 
 .calendar-day {
+  position: relative; /* 🟢 お薬インジケータードットを絶対配置するための基準点 */
   color: #2c2c2c;
   cursor: pointer;
   border-radius: 8px;
@@ -174,6 +172,19 @@ body {
   pointer-events: none;
 }
 
+/* 🟢【新設】お薬が登録されている日に品よく灯るドットマーク */
+.calendar-day.has-med::after {
+  content: "";
+  position: absolute;
+  bottom: 6px;       /* 数字の下側に配置 */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: #10b981; /* 優しく清潔感のある医療エメラルドグリーン */
+}
+
 /* ==========================================================================
    5. インライン・アコーディオン（魔法の引き出しパネル）
    ========================================================================== */
@@ -191,13 +202,15 @@ body {
   transition: max-height 0.25s ease-out, opacity 0.2s ease-out, padding 0.25s ease-out, margin 0.25s ease-out;
 }
 
+/* 🟢【拡張】お薬が複数並んでも潰れないよう、最大高さを安全に拡張 */
 .accordion-panel.is-open {
-  max-height: 140px; 
+  max-height: 400px; 
   opacity: 1;
-  padding: 16px;
+  padding: 18px 16px;
   margin: 8px 0;
   background-color: #ffffff;
   box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.02);
+  overflow-y: auto; /* 万が一お薬が大量にあってもスクロール可能 */
 }
 
 .accordion-title {
@@ -205,7 +218,7 @@ body {
   font-weight: 700;
   color: #2c2c2c;
   margin-top: 0;
-  margin-bottom: 8px;
+  margin-bottom: 14px;
 }
 
 .accordion-content {
@@ -214,54 +227,133 @@ body {
   line-height: 1.6;
 }
 
+/* 🟢【新設】アコーディオン内の「高齢者ファースト」な巨大服薬チェックUI */
+
+.med-check-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* 服用ボタン同士の間隔 */
+}
+
+.med-check-item {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+.med-check-item:hover {
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+/* チェックを入れたときの「達成感」を演出するスタイル */
+.med-check-item.is-checked {
+  background-color: #ecfdf5; /* 優しいグリーンに変更 */
+  border-color: #a7f3d0;
+}
+.med-check-item.is-checked .med-check-text {
+  color: #059669;
+  text-decoration: line-through; /* 完了の取り消し線 */
+  opacity: 0.7;
+}
+
+.med-checkbox {
+  width: 22px;  /* 高齢者の方が視認しやすい特大サイズ */
+  height: 22px;
+  cursor: pointer;
+  margin-right: 14px;
+}
+
+.med-check-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* タイミングバッチ（朝、昼、夕、眠前、頓用） */
+.med-time-tag {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #ffffff;
+}
+/* タイミングごとのテーマカラー定義 */
+.med-time-tag.morning  { background-color: #ea580c; } /* 朝：太陽のオレンジ */
+.med-time-tag.noon     { background-color: #ca8a04; } /* 昼：真昼のゴールド */
+.med-time-tag.evening  { background-color: #0284c7; } /* 夕：夕暮れのブルー */
+.med-time-tag.bedtime  { background-color: #4d7c0f; } /* 眠前：静かなオリーブグラフ */
+.med-time-tag.tonyo    { background-color: #64748b; } /* 頓用：ニュートラルなスレート */
+
+.med-check-text {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.med-check-subtext {
+  font-size: 12px;
+  color: #64748b;
+}
+
+/* お薬が一件もない日の優しいメッセージ */
+.no-medicine-msg {
+  text-align: center;
+  padding: 16px 0;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
 /* ==========================================================================
-   6. 【新設】極上のボトムインフォ（登録用ボトムシート）デザイン
+   6. ボトムインフォ（登録用ボトムシート）デザイン
    ========================================================================== */
 
-/* 👥 背後を覆ううっすらダークなスモーク背景 */
 #bottom-sheet-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.4); /* ほどよい暗さでカードを手前に引き立てる */
+  background-color: rgba(0, 0, 0, 0.4); 
   opacity: 0;
-  pointer-events: none; /* 閉じている時は下の画面を触れるように無効化 */
+  pointer-events: none; 
   transition: opacity 0.3s ease;
-  z-index: 100; /* カレンダーや浮遊ボタンを完全に覆う */
+  z-index: 100; 
 }
 #bottom-sheet-overlay.is-active {
   opacity: 1;
-  pointer-events: auto; /* 開いたらタップを検知させてクローズ可能にする */
+  pointer-events: auto; 
 }
 
-/* 📥 下からぬるりとせり上がる登録画面本体 */
 #register-bottom-sheet {
   position: fixed;
   bottom: 0;
   left: 50%;
-  transform: translate(-50%, 100%); /* 初期状態は画面の一番下（視界の外）に格納 */
+  transform: translate(-50%, 100%); 
   width: 100%;
-  max-width: 440px; /* スマートフォンや細身のカード幅にジャストフィット */
-  height: 80vh;     /* 画面の高さの8割までせり上がる、安心のゆったり大容量 */
+  max-width: 440px; 
+  height: 80vh;     
   background-color: #ffffff;
-  border-top-left-radius: 20px;  /* 上部だけを大きく丸めて「引き出し」感を演出 */
+  border-top-left-radius: 20px;  
   border-top-right-radius: 20px;
   box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.12);
   display: flex;
   flex-direction: column;
-  transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1); /* 高級感のあるしっとりした加減速 */
-  z-index: 101; /* スモーク背景のさらに1つ手前 */
+  transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1); 
+  z-index: 101; 
   box-sizing: border-box;
 }
 
-/* シートが開いた状態のトリガークラス */
 #register-bottom-sheet.is-open {
-  transform: translate(-50%, 0); /* 指定位置まで「するり」と上昇 */
+  transform: translate(-50%, 0); 
 }
 
-/* つまみ（ビジュアル的な引き下げハンドル） */
 .sheet-handle {
   width: 40px;
   height: 5px;
@@ -270,7 +362,6 @@ body {
   margin: 12px auto 4px auto;
 }
 
-/* シートのヘッダー部（タイトルと×ボタン） */
 .sheet-header {
   display: flex;
   align-items: center;
@@ -297,19 +388,16 @@ body {
 }
 #close-register-btn:hover { color: #333; }
 
-/* フォームのスクロール可能ボディ領域 */
 .sheet-body {
   flex: 1;
-  overflow-y: auto; /* 入力欄が多くても縦スクロールで確実に操作可能 */
+  overflow-y: auto; 
   padding: 24px;
   box-sizing: border-box;
 }
 
-/* ＝ フォーム部品の美しいユニバーサルデザイン ＝ */
-
 .form-group {
   margin-bottom: 20px;
-  animation: fadeIn 0.3s ease forwards; /* 項目出現時の優しいフェードイン */
+  animation: fadeIn 0.3s ease forwards; 
 }
 
 .form-label {
@@ -334,11 +422,10 @@ body {
   line-height: 1.4;
 }
 
-/* 高齢者の方や指の震えでも誤入力しにくい、大きめでクッキリした入力部品 */
 .form-input,
 .form-select {
   width: 100%;
-  height: 48px; /* 押しやすい絶妙な高さ */
+  height: 48px; 
   padding: 0 16px;
   font-size: 16px;
   font-family: inherit;
@@ -357,19 +444,16 @@ body {
   box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
 }
 
-/* 開始日と終了日の2列レイアウト */
 .duration-inputs {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
 
-/* 隠し要素（条件を満たすまで綺麗に非表示にする） */
 .hidden {
   display: none !important;
 }
 
-/* 分類チェックボックス（広いタップ領域を確保したボタン風デザイン） */
 .category-checkboxes {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -400,7 +484,6 @@ body {
   cursor: pointer;
 }
 
-/* 登録確定ボタン */
 #submit-register-btn {
   width: 100%;
   height: 52px;

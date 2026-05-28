@@ -38,6 +38,7 @@
       </div>
 
       <div class="sheet-body">
+        
         <div class="form-group">
           <label for="med-name" class="form-label">1. お薬の名前</label>
           <input type="text" id="med-name" class="form-input" placeholder="例：メディログ錠 10mg">
@@ -51,7 +52,7 @@
               <input type="date" id="med-start-date" class="form-input">
             </div>
             <div>
-              <span class="sub-label">終了日（継続予定ならば空欄）</span>
+              <span class="sub-label">終了日（永続なら空欄）</span>
               <input type="date" id="med-end-date" class="form-input" placeholder="永続的に服用">
             </div>
           </div>
@@ -83,12 +84,12 @@
 
         <div id="time-category-group" class="form-group hidden">
           <label class="form-label">5. 該当する時間帯（複数選択可）</label>
-          <p class="form-hint">※介助者や家族が「どの時間帯のお薬か」を判別するための覚書</p>
+          <p class="form-hint">※介助者や家族が「どの時間帯のお薬か」を判別するための重要な分類です。</p>
           <div class="category-checkboxes">
-            <label class="category-label"><input type="checkbox" value="morning"> 朝（あさ）</label>
-            <label class="category-label"><input type="checkbox" value="noon"> 昼（ひる）</label>
-            <label class="category-label"><input type="checkbox" value="evening"> 夕（ゆう）</label>
-            <label class="category-label"><input type="checkbox" value="bedtime"> 眠前（みんぜん）</label>
+            <label class="category-label"><input type="checkbox" value="morning" id="check-morning"> 朝（あさ）</label>
+            <label class="category-label"><input type="checkbox" value="noon" id="check-noon"> 昼（ひる）</label>
+            <label class="category-label"><input type="checkbox" value="evening" id="check-evening"> 夕（ゆう）</label>
+            <label class="category-label"><input type="checkbox" value="bedtime" id="check-bedtime"> 眠前（みんぜん）</label>
           </div>
         </div>
 
