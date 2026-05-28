@@ -23,6 +23,78 @@
 
       <div id="calendar-container"></div>
 
+      <button id="floating-register-btn" aria-label="新しいお薬を登録する">＋</button>
+
+    </div>
+
+    <div id="bottom-sheet-overlay"></div>
+
+    <div id="register-bottom-sheet">
+      <div class="sheet-handle"></div>
+      
+      <div class="sheet-header">
+        <h3 class="sheet-title">💊 新しいお薬の登録</h3>
+        <button id="close-register-btn" aria-label="閉じる">×</button>
+      </div>
+
+      <div class="sheet-body">
+        <div class="form-group">
+          <label for="med-name" class="form-label">1. お薬の名前</label>
+          <input type="text" id="med-name" class="form-input" placeholder="例：メディログ錠 10mg">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">2. 服用期間</label>
+          <div class="duration-inputs">
+            <div>
+              <span class="sub-label">開始日（必須）</span>
+              <input type="date" id="med-start-date" class="form-input">
+            </div>
+            <div>
+              <span class="sub-label">終了日（継続予定ならば空欄）</span>
+              <input type="date" id="med-end-date" class="form-input" placeholder="永続的に服用">
+            </div>
+          </div>
+          <p class="form-hint">※終了日を指定しない場合は、その後も永続的にカレンダーに表示されます。</p>
+        </div>
+
+        <div class="form-group">
+          <label for="med-frequency" class="form-label">3. 1日の服用回数</label>
+          <select id="med-frequency" class="form-select">
+            <option value="">選択してください</option>
+            <option value="3">1日3回（朝・昼・夕など）</option>
+            <option value="2">1日2回（朝・夕など）</option>
+            <option value="1">1日1回（朝のみ・眠前など）</option>
+            <option value="tonyo">頓用（痛いとき・眠れないときなど）</option>
+            <option value="free">フリー記載（特殊な用法）</option>
+          </select>
+        </div>
+
+        <div id="detail-usage-group" class="form-group hidden">
+          <label for="med-detail-usage" class="form-label">4. 服用の詳しいタイミング</label>
+          <select id="med-detail-usage" class="form-select">
+            </select>
+        </div>
+
+        <div id="free-input-group" class="form-group hidden">
+          <label for="med-free-usage" class="form-label">4. 具体的な用法を入力してください</label>
+          <input type="text" id="med-free-usage" class="form-input" placeholder="例：14時のおやつ時、リハビリの前、など">
+        </div>
+
+        <div id="time-category-group" class="form-group hidden">
+          <label class="form-label">5. 該当する時間帯（複数選択可）</label>
+          <p class="form-hint">※介助者や家族が「どの時間帯のお薬か」を判別するための覚書</p>
+          <div class="category-checkboxes">
+            <label class="category-label"><input type="checkbox" value="morning"> 朝（あさ）</label>
+            <label class="category-label"><input type="checkbox" value="noon"> 昼（ひる）</label>
+            <label class="category-label"><input type="checkbox" value="evening"> 夕（ゆう）</label>
+            <label class="category-label"><input type="checkbox" value="bedtime"> 眠前（みんぜん）</label>
+          </div>
+        </div>
+
+        <button id="submit-register-btn">この内容でお薬を登録する</button>
+
+      </div>
     </div>
 
   </div>

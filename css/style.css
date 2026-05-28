@@ -11,11 +11,19 @@ body {
   padding: 0;
 }
 
+#app {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
 /* ==========================================================================
-   2. カレンダー外殻コンテナ（レイアウト・質感定義）
+   2. カレンダー外殻コンテナ ＆ 右下浮遊（＋）ボタン
    ========================================================================== */
 
 .calendar-card {
+  position: relative; /* 子要素の浮遊ボタンの基準点となるようrelative化 */
   max-width: 400px;
   margin: 60px auto;
   background-color: #ffffff;
@@ -61,6 +69,38 @@ body {
   background-color: #f5f5f5;
 }
 
+/* ✨【新設計】右下にオーバーレイで美しく浮かぶ（＋）ボタン */
+#floating-register-btn {
+  position: absolute;
+  bottom: -20px;  /* 31日のマスの右下、カレンダーカードの枠線上に絶妙に重なる配置 */
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%; /* 完璧な真ん丸 */
+  background-color: #2c2c2c; /* 高級感があり目に優しいチャコール黒 */
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 400;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  z-index: 10; /* カレンダーのマスよりも確実に手前に浮かす */
+}
+
+#floating-register-btn:hover {
+  background-color: #444444;
+  transform: translateY(-2px); /* ホバー時にわずかに浮かび上がる浮遊感 */
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+#floating-register-btn:active {
+  transform: translateY(1px) scale(0.95); /* 押し込んだ時の肉体的な手応え */
+}
+
 /* ==========================================================================
    3. 週単位アコーディオンシステム（ガタつき・横揺れ防止のコア構造）
    ========================================================================== */
@@ -71,7 +111,6 @@ body {
   width: 100%;
 }
 
-/* 🗺️ 1週間（7日間分）を完全に均等に横一列に並べるための専用Grid行コンテナ */
 .calendar-week-row {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -79,7 +118,6 @@ body {
   gap: 8px 0;
 }
 
-/* ⚠️ 曜日ヘッダー行：日付グリッドと位置を完全に同期させる独立した7列Grid */
 .calendar-header-row {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -103,7 +141,6 @@ body {
 .calendar-header.saturday { color: #2b6cb0; }
 .calendar-header.sunday   { color: #c53030; }
 
-/* 🔢 全ての日付マスの基本形状管理（正方形をロックして歪みを防ぐ） */
 .calendar-day, 
 .calendar-day-blank,
 .calendar-day.empty {
@@ -116,7 +153,6 @@ body {
   box-sizing: border-box;
 }
 
-/* 数字が入る、インタラクティブな日付マス */
 .calendar-day {
   color: #2c2c2c;
   cursor: pointer;
@@ -130,7 +166,6 @@ body {
   transform: scale(0.95);
 }
 
-/* 当月以外の空白マス：空間維持のため形状のみ残して透明化 */
 .calendar-day-blank,
 .calendar-day.empty {
   background-color: transparent;
@@ -148,17 +183,14 @@ body {
   background-color: #fafafa;
   border-top: 1px dashed #eef0f2;
   border-bottom: 1px dashed #eef0f2;
-  
   overflow: hidden;
   max-height: 0;
   opacity: 0;
   box-sizing: border-box;
   padding: 0 16px;
-  
   transition: max-height 0.25s ease-out, opacity 0.2s ease-out, padding 0.25s ease-out, margin 0.25s ease-out;
 }
 
-/* 展開状態の定義 */
 .accordion-panel.is-open {
   max-height: 140px; 
   opacity: 1;
@@ -180,4 +212,215 @@ body {
   font-size: 14px;
   color: #555555;
   line-height: 1.6;
+}
+
+/* ==========================================================================
+   6. 【新設】極上のボトムインフォ（登録用ボトムシート）デザイン
+   ========================================================================== */
+
+/* 👥 背後を覆ううっすらダークなスモーク背景 */
+#bottom-sheet-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4); /* ほどよい暗さでカードを手前に引き立てる */
+  opacity: 0;
+  pointer-events: none; /* 閉じている時は下の画面を触れるように無効化 */
+  transition: opacity 0.3s ease;
+  z-index: 100; /* カレンダーや浮遊ボタンを完全に覆う */
+}
+#bottom-sheet-overlay.is-active {
+  opacity: 1;
+  pointer-events: auto; /* 開いたらタップを検知させてクローズ可能にする */
+}
+
+/* 📥 下からぬるりとせり上がる登録画面本体 */
+#register-bottom-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, 100%); /* 初期状態は画面の一番下（視界の外）に格納 */
+  width: 100%;
+  max-width: 440px; /* スマートフォンや細身のカード幅にジャストフィット */
+  height: 80vh;     /* 画面の高さの8割までせり上がる、安心のゆったり大容量 */
+  background-color: #ffffff;
+  border-top-left-radius: 20px;  /* 上部だけを大きく丸めて「引き出し」感を演出 */
+  border-top-right-radius: 20px;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1); /* 高級感のあるしっとりした加減速 */
+  z-index: 101; /* スモーク背景のさらに1つ手前 */
+  box-sizing: border-box;
+}
+
+/* シートが開いた状態のトリガークラス */
+#register-bottom-sheet.is-open {
+  transform: translate(-50%, 0); /* 指定位置まで「するり」と上昇 */
+}
+
+/* つまみ（ビジュアル的な引き下げハンドル） */
+.sheet-handle {
+  width: 40px;
+  height: 5px;
+  background-color: #e0e0e0;
+  border-radius: 3px;
+  margin: 12px auto 4px auto;
+}
+
+/* シートのヘッダー部（タイトルと×ボタン） */
+.sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.sheet-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #2c2c2c;
+  margin: 0;
+}
+
+#close-register-btn {
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #999;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+}
+#close-register-btn:hover { color: #333; }
+
+/* フォームのスクロール可能ボディ領域 */
+.sheet-body {
+  flex: 1;
+  overflow-y: auto; /* 入力欄が多くても縦スクロールで確実に操作可能 */
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+/* ＝ フォーム部品の美しいユニバーサルデザイン ＝ */
+
+.form-group {
+  margin-bottom: 20px;
+  animation: fadeIn 0.3s ease forwards; /* 項目出現時の優しいフェードイン */
+}
+
+.form-label {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  color: #2c2c2c;
+  margin-bottom: 8px;
+}
+
+.sub-label {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.form-hint {
+  font-size: 12px;
+  color: #7d8590;
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
+/* 高齢者の方や指の震えでも誤入力しにくい、大きめでクッキリした入力部品 */
+.form-input,
+.form-select {
+  width: 100%;
+  height: 48px; /* 押しやすい絶妙な高さ */
+  padding: 0 16px;
+  font-size: 16px;
+  font-family: inherit;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  background-color: #ffffff;
+  color: #2c2c2c;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-input:focus,
+.form-select:focus {
+  outline: none;
+  border-color: #2c2c2c;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+}
+
+/* 開始日と終了日の2列レイアウト */
+.duration-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* 隠し要素（条件を満たすまで綺麗に非表示にする） */
+.hidden {
+  display: none !important;
+}
+
+/* 分類チェックボックス（広いタップ領域を確保したボタン風デザイン） */
+.category-checkboxes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.category-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background-color: #f6f8fa;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #2c2c2c;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+.category-label:hover {
+  background-color: #f0f2f5;
+}
+.category-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+/* 登録確定ボタン */
+#submit-register-btn {
+  width: 100%;
+  height: 52px;
+  background-color: #2c2c2c;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 12px;
+  margin-bottom: 24px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.2s;
+}
+#submit-register-btn:hover {
+  background-color: #444444;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
 }

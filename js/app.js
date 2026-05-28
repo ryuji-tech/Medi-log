@@ -40,7 +40,7 @@ function renderCalendar(year, month) {
   const weekdays = ["月", "火", "水", "木", "金", "土", "日"];
 
   // ------------------------------------------------------------------------
-  // 【重要・復旧】ステップ0：曜日ヘッダー行の独立生成と配置
+  // ステップ0：曜日ヘッダー行の独立生成と配置
   // ------------------------------------------------------------------------
   const headerRow = document.createElement("div");
   headerRow.classList.add("calendar-header-row"); // 7列Gridのヘッダー専用コンテナ
@@ -60,13 +60,12 @@ function renderCalendar(year, month) {
   container.appendChild(headerRow); // 最上部に配置
 
   // ------------------------------------------------------------------------
-  // 【新設計】週単位分割アコーディオン構築ロジック
+  // 週単位分割アコーディオン構築ロジック
   // ------------------------------------------------------------------------
 
-  // 1. カレンダーを構成する全マス（前月空白 ＋ 当月日付）を一時配列にフラットに格納
   const allSlots = [];
 
-  // 【前月の空白マスの生成】（月曜始まりに対応するためのオフセット計算）
+  // 【前月の空白マスの生成】
   const emptyDaysCount = (firstDayIndex + 6) % 7;
   for (let i = 0; i < emptyDaysCount; i++) {
     const emptySlot = document.createElement("div");
@@ -79,42 +78,38 @@ function renderCalendar(year, month) {
     const daySlot = document.createElement("div");
     daySlot.classList.add("calendar-day"); 
     daySlot.textContent = day;            
-    daySlot.dataset.day = day; // カスタムデータ属性に日付を保持
+    daySlot.dataset.day = day; 
     allSlots.push(daySlot);        
   }
 
-  // 2. 格納した全マスを「7個ずつ（1週間単位）」のチャンクに切り分けて画面に構築
+  // 格納した全マスを「7個ずつ（1週間単位）」に切り分けて画面に構築
   for (let i = 0; i < allSlots.length; i += 7) {
     const weekSlots = allSlots.slice(i, i + 7);
     
-    // 1週間分のグリッド行コンテナを生成
     const weekRow = document.createElement("div");
     weekRow.classList.add("calendar-week-row");
     weekSlots.forEach(slot => weekRow.appendChild(slot));
     
-    // この「週の行」の直下に、専用のアコーディオンパネルを最初から1通ずつ仕込んでおく
     const panel = document.createElement("div");
     panel.classList.add("accordion-panel");
     
-    // DOMに週の行と専用パネルをセットでバインド
     container.appendChild(weekRow);
     container.appendChild(panel);
 
-    // 3. この週に属する各日付マスに対してインタラクション（クリック）を設定
+    // 各日付マスに対してインタラクションを設定
     weekSlots.forEach(slot => {
-      if (slot.classList.contains("empty")) return; // 空白マスは処理スキップ
+      if (slot.classList.contains("empty")) return; 
 
       slot.addEventListener("click", () => {
         const day = parseInt(slot.dataset.day);
         const dayOfWeek = weekdays[(firstDayIndex + day - 2 + 7) % 7];
 
-        // ① 他の週のアコーディオンが開いている場合、すべて強制クローズ
         const allPanels = container.querySelectorAll(".accordion-panel");
         allPanels.forEach(p => {
           if (p !== panel) p.classList.remove("is-open");
         });
 
-        // ② 動的に流し込むインラインコンテンツのHTMLを組み立て
+        // 日々のチェック・確認用アコーディオンの中身（純粋な確認エリア）
         const newHTML = `
           <h3 class="accordion-title">💊 ${month}月${day}日（${dayOfWeek}）のお薬記録</h3>
           <div class="accordion-content">
@@ -122,14 +117,10 @@ function renderCalendar(year, month) {
           </div>
         `;
 
-        // ③ 【インタラクションの最適化】
-        // すでに「同じ週」の別の日付が選択されておりパネルが開いている場合は、
-        // 無駄な開閉モーションをスキップし、中のデータ（テキスト）だけをヌルリと自然に差し替える。
         if (panel.classList.contains("is-open")) {
           panel.innerHTML = newHTML;
         } else {
           panel.innerHTML = newHTML;
-          // DOMへの配置完了をほんのわずかに待ってからクラスを付与し、スムーズな縦展開アニメーションを発動
           setTimeout(() => {
             panel.classList.add("is-open");
           }, 10);
@@ -162,6 +153,124 @@ document.getElementById("next-month-btn").addEventListener("click", () => {
 });
 
 // ==========================================================================
-// 5. アプリケーション初期化
+// 5. ✨【新設】お薬登録用ボトムインフォ制御インタラクション
+// ==========================================================================
+
+// DOM要素のキャッシュ
+const floatingBtn = document.getElementById("floating-register-btn");
+const bottomSheet = document.getElementById("register-bottom-sheet");
+const sheetOverlay = document.getElementById("bottom-sheet-overlay");
+const closeSheetBtn = document.getElementById("close-register-btn");
+
+const frequencySelect = document.getElementById("med-frequency");
+const detailUsageGroup = document.getElementById("detail-usage-group");
+const detailUsageSelect = document.getElementById("med-detail-usage");
+const freeInputGroup = document.getElementById("free-input-group");
+const timeCategoryGroup = document.getElementById("time-category-group");
+
+/**
+ * ボトムインフォ（登録画面）を開く関数
+ */
+function openBottomSheet() {
+  bottomSheet.classList.add("is-open");
+  sheetOverlay.classList.add("is-active");
+  // 開始日の初期値として現在のリアルな日付を自動セット（親切設計）
+  document.getElementById("med-start-date").value = new Date().toISOString().split('T')[0];
+}
+
+/**
+ * ボトムインフォ（登録画面）を閉じる関数
+ */
+function closeBottomSheet() {
+  bottomSheet.classList.remove("is-open");
+  sheetOverlay.classList.remove("is-active");
+}
+
+// ボタンクリックイベントの紐付け
+floatingBtn.addEventListener("click", openBottomSheet);
+closeSheetBtn.addEventListener("click", closeBottomSheet);
+sheetOverlay.addEventListener("click", closeBottomSheet); // スモーク部分のタップでも優しく閉じる
+
+/**
+ * 服用回数ベースの用法マスター動的切り替えロジック
+ */
+frequencySelect.addEventListener("change", (e) => {
+  const value = e.target.value;
+
+  // 一旦すべての連動グループを隠す
+  detailUsageGroup.classList.add("hidden");
+  freeInputGroup.classList.add("hidden");
+  timeCategoryGroup.classList.add("hidden");
+  detailUsageSelect.innerHTML = "";
+
+  if (!value) return;
+
+  // 1日の服用回数に応じたシチュエーションマスター定義
+  let options = [];
+
+  if (value === "3") {
+    options = [
+      { text: "朝・昼・夕食後（毎食後）", val: "3_meals_after" },
+      { text: "朝・昼・夕食前（毎食前）", val: "3_meals_before" }
+    ];
+  } else if (value === "2") {
+    options = [
+      { text: "朝・夕食後", val: "2_morning_evening_after" },
+      { text: "朝・昼食後", val: "2_morning_noon_after" },
+      { text: "昼・夕食後", val: "2_noon_evening_after" },
+      { text: "朝食後・眠前", val: "2_morning_bedtime" },
+      { text: "朝・夕食前", val: "2_morning_evening_before" }
+    ];
+  } else if (value === "1") {
+    options = [
+      { text: "朝食後", val: "1_morning_after" },
+      { text: "朝食前", val: "1_morning_before" },
+      { text: "昼食後", val: "1_noon_after" },
+      { text: "夕食後", val: "1_evening_after" },
+      { text: "就寝前（眠前）", val: "1_bedtime" },
+      { text: "起床時", val: "1_wakeup" }
+    ];
+  } else if (value === "tonyo") {
+    options = [
+      { text: "頭痛・痛むとき（消炎鎮痛用）", val: "tonyo_pain" },
+      { text: "熱があるとき（解熱用）", val: "tonyo_fever" },
+      { text: "眠れないとき（不眠時用）", val: "tonyo_insomnia" },
+      { text: "便秘のとき（緩下用）", val: "tonyo_constipation" }
+    ];
+  }
+
+  // 選択肢を動的に生成して流し込む
+  if (options.length > 0) {
+    options.forEach(opt => {
+      const el = document.createElement("option");
+      el.value = opt.val;
+      el.textContent = opt.text;
+      detailUsageSelect.appendChild(el);
+    });
+    detailUsageGroup.classList.remove("hidden"); // 詳細セレクトを表示
+  }
+
+  // 💡「フリー記載」または「頓用」が選ばれたら、介助者のために時間帯分類チェックを強制表示する
+  if (value === "free") {
+    freeInputGroup.classList.remove("hidden"); // テキスト入力欄を出現
+    timeCategoryGroup.classList.remove("hidden"); // 分類チェックボックスを出現
+  } else if (value === "tonyo") {
+    timeCategoryGroup.classList.remove("hidden"); // 頓用の場合も、どのタイミングで飲ませるべきか分類できるよう表示
+  }
+});
+
+// デモ用の登録確定イベント（ボタンが押されたら優しく閉じる）
+document.getElementById("submit-register-btn").addEventListener("click", () => {
+  const medName = document.getElementById("med-name").value;
+  if (!medName) {
+    alert("お薬の名前を入力してください。");
+    return;
+  }
+  alert(`✨ デモ動作：お薬「${medName}」をシステムに仮登録しました。確認用アラート`);
+  closeBottomSheet();
+});
+
+// ==========================================================================
+// 6. アプリケーション初期化
 // ==========================================================================
 renderCalendar(currentYear, currentMonth);
