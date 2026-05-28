@@ -1,47 +1,32 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>medi-log</title>
-
-    <!-- Google Fonts から Noto Sans JP を読み込む -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="css/style.css">
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medi-log（メディログ）｜お薬服用管理カレンダー</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <!-- アプリ全体のコンテナ -->
-    <div id="app">
 
-        <!-- ヘッダーエリア -->
-        <header class="app-header">
-            <h1 class="">Medi-log</h1>
-        </header>
-        <!-- /.app-header -->
+  <div id="app">
 
-        <!-- メインエリア（カレンダーの配置場所） -->
-        <main class="app-main">
-            <div class="calendar-card">
+    <div class="calendar-card">
 
-                <div id="calendar-header-ui">
-                    <button id="prev-month-btn">＜</button> <h2 id="calendar-title">2026年 5月</h2>
-                    <button id="next-month-btn">＞</button> </div>    
+      <div id="calendar-header-ui">
+        <button id="prev-month-btn" class="nav-btn" aria-label="先月へ">&lt;</button>
+        <h2 id="calendar-title"></h2>
+        <button id="next-month-btn" class="nav-btn" aria-label="来月へ">&gt;</button>
+      </div>    
 
-                <div id="calendar-container"></div>
-                <!-- ここにカレンダーを入れる -->
-
-            </div>
-        </main>
-        <!-- /.app-main -->
+      <div id="calendar-container"></div>
 
     </div>
-    <!-- /.app-->
 
-    <!-- JavaScriptファイル -->
-    <script src="js/app.js"></script>
+  </div>
+
+  <script src="js/app.js"></script>
 </body>
 </html>
