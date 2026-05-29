@@ -82,8 +82,46 @@
           <input type="text" id="med-free-usage" class="form-input" placeholder="例：14時のおやつ時、リハビリの前、など">
         </div>
 
+        <div id="dosage-group" class="form-group hidden">
+          <label class="form-label">5. 1回にのむ量</label>
+          
+          <div id="dosage-uniform-area">
+            <div class="input-unit-wrapper">
+              <input type="number" id="med-dosage-uniform" class="form-input" step="0.1" min="0.1" value="1" placeholder="例：1">
+              <span class="input-unit-text">錠 / カプセル / 包</span>
+            </div>
+          </div>
+
+          <label class="variable-dosage-switch" id="variable-dosage-switch-label">
+            <input type="checkbox" id="toggle-variable-dosage">
+            <span>朝・昼・夕などで、のむ量が違う場合はこちら</span>
+          </label>
+
+          <div id="dosage-variable-area" class="hidden">
+            <p class="form-hint" style="margin-bottom: 10px;">※のまない時間帯は「0」にするか空欄のままで大丈夫です。</p>
+            <div class="variable-inputs-grid">
+              <div id="v-input-morning" class="v-input-box hidden">
+                <span class="sub-label">🌅 朝の量</span>
+                <input type="number" id="dosage-m" class="form-input" step="0.1" min="0" placeholder="0">
+              </div>
+              <div id="v-input-noon" class="v-input-box hidden">
+                <span class="sub-label">☀️ 昼の量</span>
+                <input type="number" id="dosage-n" class="form-input" step="0.1" min="0" placeholder="0">
+              </div>
+              <div id="v-input-evening" class="v-input-box hidden">
+                <span class="sub-label">🌌 夕の量</span>
+                <input type="number" id="dosage-e" class="form-input" step="0.1" min="0" placeholder="0">
+              </div>
+              <div id="v-input-bedtime" class="v-input-box hidden">
+                <span class="sub-label">🌙 眠前の量</span>
+                <input type="number" id="dosage-b" class="form-input" step="0.1" min="0" placeholder="0">
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div id="time-category-group" class="form-group hidden">
-          <label class="form-label">5. 該当する時間帯（複数選択可）</label>
+          <label class="form-label">6. 該当する時間帯（複数選択可）</label>
           <p class="form-hint">※介助者や家族が「どの時間帯のお薬か」を判別するための重要な分類です。</p>
           <div class="category-checkboxes">
             <label class="category-label"><input type="checkbox" value="morning" id="check-morning"> 朝（あさ）</label>

@@ -151,7 +151,7 @@ body {
 }
 
 .calendar-day {
-  position: relative; /* 🟢 お薬インジケータードットを絶対配置するための基準点 */
+  position: relative; 
   color: #2c2c2c;
   cursor: pointer;
   border-radius: 8px;
@@ -172,21 +172,20 @@ body {
   pointer-events: none;
 }
 
-/* 🟢【新設】お薬が登録されている日に品よく灯るドットマーク */
 .calendar-day.has-med::after {
   content: "";
   position: absolute;
-  bottom: 6px;       /* 数字の下側に配置 */
+  bottom: 6px;       
   left: 50%;
   transform: translateX(-50%);
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background-color: #10b981; /* 優しく清潔感のある医療エメラルドグリーン */
+  background-color: #10b981; 
 }
 
 /* ==========================================================================
-   5. インライン・アコーディオン（魔法の引き出しパネル）
+   5. インライン・アコーディオン ＆ ✨【新設】時間帯グループ構造
    ========================================================================== */
 
 .accordion-panel {
@@ -199,18 +198,17 @@ body {
   opacity: 0;
   box-sizing: border-box;
   padding: 0 16px;
-  transition: max-height 0.25s ease-out, opacity 0.2s ease-out, padding 0.25s ease-out, margin 0.25s ease-out;
+  transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease-out, padding 0.25s ease-out, margin 0.25s ease-out;
 }
 
-/* 🟢【拡張】お薬が複数並んでも潰れないよう、最大高さを安全に拡張 */
 .accordion-panel.is-open {
-  max-height: 400px; 
+  max-height: 500px; /* 時間帯グループ化に伴い、高さを安全に拡張 */
   opacity: 1;
   padding: 18px 16px;
   margin: 8px 0;
   background-color: #ffffff;
   box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.02);
-  overflow-y: auto; /* 万が一お薬が大量にあってもスクロール可能 */
+  overflow-y: auto; 
 }
 
 .accordion-title {
@@ -218,30 +216,43 @@ body {
   font-weight: 700;
   color: #2c2c2c;
   margin-top: 0;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
-.accordion-content {
-  font-size: 14px;
-  color: #555555;
-  line-height: 1.6;
+/* ✨【新設】時間帯別のセクション外殻構造 */
+.time-category-section {
+  margin-bottom: 18px;
+}
+.time-category-section:last-child {
+  margin-bottom: 4px;
 }
 
-/* 🟢【新設】アコーディオン内の「高齢者ファースト」な巨大服薬チェックUI */
+/* ✨【新設】時間帯別の美しく視認性の高い見出し */
+.time-category-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #475569;
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #f1f5f9;
+}
 
 .med-check-list {
   display: flex;
   flex-direction: column;
-  gap: 10px; /* 服用ボタン同士の間隔 */
+  gap: 8px; 
 }
 
 .med-check-item {
   display: flex;
   align-items: center;
-  padding: 14px 16px;
+  padding: 12px 14px;
   background-color: #f8fafc;
   border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.15s, border-color 0.15s;
 }
@@ -250,49 +261,35 @@ body {
   border-color: #cbd5e1;
 }
 
-/* チェックを入れたときの「達成感」を演出するスタイル */
 .med-check-item.is-checked {
-  background-color: #ecfdf5; /* 優しいグリーンに変更 */
+  background-color: #ecfdf5; 
   border-color: #a7f3d0;
 }
 .med-check-item.is-checked .med-check-text {
   color: #059669;
-  text-decoration: line-through; /* 完了の取り消し線 */
-  opacity: 0.7;
+  text-decoration: line-through; 
+  opacity: 0.6;
+}
+.med-check-item.is-checked .med-check-subtext {
+  opacity: 0.5;
 }
 
 .med-checkbox {
-  width: 22px;  /* 高齢者の方が視認しやすい特大サイズ */
-  height: 22px;
+  width: 20px;  
+  height: 20px;
   cursor: pointer;
-  margin-right: 14px;
+  margin-right: 12px;
 }
 
 .med-check-info {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
+  flex: 1;
 }
-
-/* タイミングバッチ（朝、昼、夕、眠前、頓用） */
-.med-time-tag {
-  display: inline-block;
-  align-self: flex-start;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 4px;
-  color: #ffffff;
-}
-/* タイミングごとのテーマカラー定義 */
-.med-time-tag.morning  { background-color: #ea580c; } /* 朝：太陽のオレンジ */
-.med-time-tag.noon     { background-color: #ca8a04; } /* 昼：真昼のゴールド */
-.med-time-tag.evening  { background-color: #0284c7; } /* 夕：夕暮れのブルー */
-.med-time-tag.bedtime  { background-color: #4d7c0f; } /* 眠前：静かなオリーブグラフ */
-.med-time-tag.tonyo    { background-color: #64748b; } /* 頓用：ニュートラルなスレート */
 
 .med-check-text {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
   color: #1e293b;
 }
@@ -302,7 +299,6 @@ body {
   color: #64748b;
 }
 
-/* お薬が一件もない日の優しいメッセージ */
 .no-medicine-msg {
   text-align: center;
   padding: 16px 0;
@@ -448,6 +444,59 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
+}
+
+/* ✨【新設】服用量フォーム専用のスタイル */
+.input-unit-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.input-unit-wrapper .form-input {
+  padding-right: 140px; /* 単位が文字と重ならないよう広めの余白を確保 */
+}
+.input-unit-text {
+  position: absolute;
+  right: 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #64748b;
+  pointer-events: none;
+}
+
+/* 変則処方チェックボックス用コンテナ */
+.variable-dosage-switch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #475569;
+  cursor: pointer;
+  padding: 4px 0;
+}
+.variable-dosage-switch input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* 内訳入力欄用のレスポンシブグリッド */
+.variable-inputs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  background-color: #f8fafc;
+  padding: 14px;
+  border-radius: 6px;
+  border: 1px dashed #cbd5e1;
+  margin-top: 8px;
+  animation: fadeIn 0.25s ease forwards;
+}
+.v-input-box {
+  display: flex;
+  flex-direction: column;
 }
 
 .hidden {
