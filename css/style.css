@@ -92,14 +92,10 @@ body {
 #floating-register-btn:hover {
   background-color: #444444;
   transform: translateY(-2px); 
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-}
-#floating-register-btn:active {
-  transform: translateY(1px) scale(0.95); 
 }
 
 /* ==========================================================================
-   3. 週単位アコーディオンシステム（ガタつき・横揺れ防止のコア構造）
+   3. カレンダーグリッド ＆ 当日アクセント
    ========================================================================== */
 
 #calendar-container {
@@ -124,10 +120,6 @@ body {
   padding-bottom: 4px;
 }
 
-/* ==========================================================================
-   4. カレンダー内パーツ（曜日・日付セル定義）
-   ========================================================================== */
-
 .calendar-header {
   text-align: center;
   font-size: 13px;
@@ -138,9 +130,7 @@ body {
 .calendar-header.saturday { color: #2b6cb0; }
 .calendar-header.sunday   { color: #c53030; }
 
-.calendar-day, 
-.calendar-day-blank,
-.calendar-day.empty {
+.calendar-day, .calendar-day-blank, .calendar-day.empty {
   aspect-ratio: 1 / 1;
   display: flex;
   align-items: center;
@@ -157,18 +147,18 @@ body {
   border-radius: 8px;
   transition: background-color 0.2s, transform 0.1s;
 }
-.calendar-day:hover {
-  background-color: #f0f2f5;
-}
-.calendar-day:active {
-  transform: scale(0.95);
+.calendar-day:hover { background-color: #f0f2f5; }
+
+/* 今日の日付マスのやんわりアクセント */
+.calendar-day.is-today {
+  background-color: #f0fdf4; 
+  font-weight: 700;
+  border: 1px solid #bbf7d0; 
 }
 
-.calendar-day-blank,
-.calendar-day.empty {
+.calendar-day-blank, .calendar-day.empty {
   background-color: transparent;
   border: none;
-  cursor: default;
   pointer-events: none;
 }
 
@@ -185,29 +175,28 @@ body {
 }
 
 /* ==========================================================================
-   5. インライン・アコーディオン ＆ ✨【新設】時間帯グループ構造
+   4. インライン・アコーディオン（カルテ表示）
    ========================================================================== */
 
 .accordion-panel {
   width: 100%;
   background-color: #fafafa;
-  border-top: 1px dashed #eef0f2;
-  border-bottom: 1px dashed #eef0f2;
   overflow: hidden;
   max-height: 0;
   opacity: 0;
   box-sizing: border-box;
   padding: 0 16px;
-  transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease-out, padding 0.25s ease-out, margin 0.25s ease-out;
+  transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease-out;
 }
 
 .accordion-panel.is-open {
-  max-height: 500px; /* 時間帯グループ化に伴い、高さを安全に拡張 */
+  max-height: 550px; 
   opacity: 1;
   padding: 18px 16px;
   margin: 8px 0;
   background-color: #ffffff;
-  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.02);
+  border-top: 1px dashed #eef0f2;
+  border-bottom: 1px dashed #eef0f2;
   overflow-y: auto; 
 }
 
@@ -219,15 +208,8 @@ body {
   margin-bottom: 16px;
 }
 
-/* ✨【新設】時間帯別のセクション外殻構造 */
-.time-category-section {
-  margin-bottom: 18px;
-}
-.time-category-section:last-child {
-  margin-bottom: 4px;
-}
+.time-category-section { margin-bottom: 18px; }
 
-/* ✨【新設】時間帯別の美しく視認性の高い見出し */
 .time-category-header {
   display: flex;
   align-items: center;
@@ -240,11 +222,7 @@ body {
   border-bottom: 1px solid #f1f5f9;
 }
 
-.med-check-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px; 
-}
+.med-check-list { display: flex; flex-direction: column; gap: 8px; }
 
 .med-check-item {
   display: flex;
@@ -254,11 +232,7 @@ body {
   border: 1px solid #e2e8f0;
   border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.15s, border-color 0.15s;
-}
-.med-check-item:hover {
-  background-color: #f1f5f9;
-  border-color: #cbd5e1;
+  transition: background-color 0.15s;
 }
 
 .med-check-item.is-checked {
@@ -270,289 +244,92 @@ body {
   text-decoration: line-through; 
   opacity: 0.6;
 }
-.med-check-item.is-checked .med-check-subtext {
-  opacity: 0.5;
-}
 
-.med-checkbox {
-  width: 20px;  
-  height: 20px;
-  cursor: pointer;
-  margin-right: 12px;
-}
-
-.med-check-info {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  flex: 1;
-}
-
-.med-check-text {
-  font-size: 14px;
-  font-weight: 700;
-  color: #1e293b;
-}
-
-.med-check-subtext {
-  font-size: 12px;
-  color: #64748b;
-}
-
-.no-medicine-msg {
-  text-align: center;
-  padding: 16px 0;
-  color: #94a3b8;
-  font-size: 14px;
-}
+.med-checkbox { width: 20px; height: 20px; margin-right: 12px; cursor: pointer; }
+.med-check-info { display: flex; flex-direction: column; flex: 1; }
+.med-check-text { font-size: 14px; font-weight: 700; color: #1e293b; }
+.med-check-subtext { font-size: 12px; color: #64748b; margin-top: 2px; }
+.no-medicine-msg { text-align: center; padding: 16px 0; color: #94a3b8; font-size: 14px; }
 
 /* ==========================================================================
-   6. ボトムインフォ（登録用ボトムシート）デザイン
+   5. ボトムシートフォーム ＆ 流用・時刻UI拡張
    ========================================================================== */
 
 #bottom-sheet-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0; width: 100%; height: 100%;
   background-color: rgba(0, 0, 0, 0.4); 
-  opacity: 0;
-  pointer-events: none; 
-  transition: opacity 0.3s ease;
-  z-index: 100; 
+  opacity: 0; pointer-events: none; transition: opacity 0.3s ease; z-index: 100; 
 }
-#bottom-sheet-overlay.is-active {
-  opacity: 1;
-  pointer-events: auto; 
-}
+#bottom-sheet-overlay.is-active { opacity: 1; pointer-events: auto; }
 
 #register-bottom-sheet {
-  position: fixed;
-  bottom: 0;
-  left: 50%;
+  position: fixed; bottom: 0; left: 50%;
   transform: translate(-50%, 100%); 
-  width: 100%;
-  max-width: 440px; 
-  height: 80vh;     
+  width: 100%; max-width: 440px; height: 85vh;     
   background-color: #ffffff;
-  border-top-left-radius: 20px;  
-  border-top-right-radius: 20px;
+  border-top-left-radius: 20px; border-top-right-radius: 20px;
   box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.12);
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1); 
-  z-index: 101; 
-  box-sizing: border-box;
+  display: flex; flex-direction: column;
+  transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1); z-index: 101; 
 }
+#register-bottom-sheet.is-open { transform: translate(-50%, 0); }
 
-#register-bottom-sheet.is-open {
-  transform: translate(-50%, 0); 
-}
+.sheet-handle { width: 40px; height: 5px; background-color: #e0e0e0; border-radius: 3px; margin: 12px auto 4px auto; }
+.sheet-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 24px; border-bottom: 1px solid #f0f0f0; }
+.sheet-title { font-size: 17px; font-weight: 700; color: #2c2c2c; margin: 0; }
+#close-register-btn { background: none; border: none; font-size: 28px; color: #999; cursor: pointer; }
+.sheet-body { flex: 1; overflow-y: auto; padding: 24px; box-sizing: border-box; }
 
-.sheet-handle {
-  width: 40px;
-  height: 5px;
-  background-color: #e0e0e0;
-  border-radius: 3px;
-  margin: 12px auto 4px auto;
-}
+.form-group { margin-bottom: 20px; }
+.form-divider { border: 0; border-top: 1px solid #f0f0f0; margin: 20px 0; }
 
-.sheet-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 24px;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.sheet-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: #2c2c2c;
-  margin: 0;
-}
-
-#close-register-btn {
-  background: none;
-  border: none;
-  font-size: 28px;
-  color: #999;
-  cursor: pointer;
-  padding: 4px;
-  line-height: 1;
-}
-#close-register-btn:hover { color: #333; }
-
-.sheet-body {
-  flex: 1;
-  overflow-y: auto; 
-  padding: 24px;
-  box-sizing: border-box;
-}
-
-.form-group {
-  margin-bottom: 20px;
-  animation: fadeIn 0.3s ease forwards; 
-}
-
-.form-label {
-  display: block;
-  font-size: 15px;
-  font-weight: 700;
-  color: #2c2c2c;
-  margin-bottom: 8px;
-}
-
-.sub-label {
-  display: block;
-  font-size: 12px;
-  color: #666;
-  margin-bottom: 4px;
-}
-
-.form-hint {
-  font-size: 12px;
-  color: #7d8590;
-  margin-top: 6px;
-  line-height: 1.4;
-}
-
-.form-input,
-.form-select {
-  width: 100%;
-  height: 48px; 
-  padding: 0 16px;
-  font-size: 16px;
-  font-family: inherit;
-  border: 1px solid #d0d7de;
-  border-radius: 6px;
-  background-color: #ffffff;
-  color: #2c2c2c;
-  box-sizing: border-box;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.form-input:focus,
-.form-select:focus {
-  outline: none;
-  border-color: #2c2c2c;
-  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
-}
-
-.duration-inputs {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-/* ✨【新設】服用量フォーム専用のスタイル */
-.input-unit-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-.input-unit-wrapper .form-input {
-  padding-right: 140px; /* 単位が文字と重ならないよう広めの余白を確保 */
-}
-.input-unit-text {
-  position: absolute;
-  right: 16px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #64748b;
-  pointer-events: none;
-}
-
-/* 変則処方チェックボックス用コンテナ */
-.variable-dosage-switch {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 10px;
-  font-size: 13px;
-  font-weight: 500;
-  color: #475569;
-  cursor: pointer;
-  padding: 4px 0;
-}
-.variable-dosage-switch input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-}
-
-/* 内訳入力欄用のレスポンシブグリッド */
-.variable-inputs-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+/* ✨ 流用ボックス用の堅実な外枠 */
+.master-stream-box {
   background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
   padding: 14px;
-  border-radius: 6px;
-  border: 1px dashed #cbd5e1;
-  margin-top: 8px;
-  animation: fadeIn 0.25s ease forwards;
-}
-.v-input-box {
-  display: flex;
-  flex-direction: column;
 }
 
-.hidden {
-  display: none !important;
+.form-label { display: block; font-size: 14px; font-weight: 700; color: #2c2c2c; margin-bottom: 8px; }
+.sub-label { display: block; font-size: 12px; color: #475569; margin-bottom: 6px; }
+.form-hint { font-size: 12px; color: #64748b; margin-top: 6px; line-height: 1.4; }
+
+.form-input, .form-select {
+  width: 100%; height: 46px; padding: 0 14px; font-size: 15px; font-family: inherit;
+  border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; background-color: #ffffff;
+}
+.form-input:focus, .form-select:focus { outline: none; border-color: #1e293b; box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.04); }
+
+.duration-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.schedule-radio-group { display: flex; gap: 14px; }
+.schedule-radio-label { display: flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer; }
+
+.weekday-checkboxes-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 8px; }
+.weekday-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 0;
+  background-color: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; cursor: pointer;
 }
 
-.category-checkboxes {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-top: 8px;
-}
+.input-unit-wrapper { position: relative; display: flex; align-items: center; }
+.input-unit-wrapper .form-input { padding-right: 140px; }
+.input-unit-text { position: absolute; right: 16px; font-size: 13px; color: #64748b; }
 
-.category-label {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
-  background-color: #f6f8fa;
-  border: 1px solid #d0d7de;
-  border-radius: 6px;
-  font-size: 15px;
-  font-weight: 500;
-  color: #2c2c2c;
-  cursor: pointer;
-  transition: background-color 0.15s, border-color 0.15s;
-}
-.category-label:hover {
-  background-color: #f0f2f5;
-}
-.category-label input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-}
+.variable-dosage-switch { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 13px; color: #475569; cursor: pointer; }
+.variable-inputs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background-color: #f8fafc; padding: 12px; border-radius: 6px; border: 1px dashed #cbd5e1; margin-top: 8px; }
+.v-input-box { display: flex; flex-direction: column; }
+
+/* ✨【新設】後追い時刻入力用の並びスタイル */
+.time-picker-flex { display: flex; align-items: center; gap: 8px; max-width: 200px; margin-top: 6px; }
+.time-input-unit { flex: 1; display: flex; flex-direction: column; }
+.time-input-separator { font-size: 20px; font-weight: 700; color: #475569; padding-bottom: 20px; }
+.text-center { text-align: center; }
 
 #submit-register-btn {
-  width: 100%;
-  height: 52px;
-  background-color: #2c2c2c;
-  color: #ffffff;
-  border: none;
-  border-radius: 6px;
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-  margin-top: 12px;
-  margin-bottom: 24px;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
-  transition: background-color 0.2s;
+  width: 100%; height: 50px; background-color: #1e293b; color: #ffffff;
+  border: none; border-radius: 6px; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 12px; margin-bottom: 24px;
 }
-#submit-register-btn:hover {
-  background-color: #444444;
-}
+#submit-register-btn:hover { background-color: #0f172a; }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+.hidden { display: none !important; }

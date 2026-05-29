@@ -33,12 +33,28 @@
       <div class="sheet-handle"></div>
       
       <div class="sheet-header">
-        <h3 class="sheet-title">💊 新しいお薬の登録</h3>
+        <h3 class="sheet-title">💊 お薬情報の登録</h3>
         <button id="close-register-btn" aria-label="閉じる">×</button>
       </div>
 
       <div class="sheet-body">
         
+        <div class="form-group master-stream-box">
+          <label class="form-label">登録方式の選択</label>
+          <div class="schedule-radio-group" style="margin-bottom: 12px;">
+            <label class="schedule-radio-label"><input type="radio" name="register-mode" value="new" checked> 新しく入力する</label>
+            <label class="schedule-radio-label"><input type="radio" name="register-mode" value="quote"> 登録済みの医薬品から流用する</label>
+          </div>
+          
+          <div id="quote-selector-area" class="hidden">
+            <span class="sub-label">流用（引用）する医薬品を選択してください</span>
+            <select id="quote-medicine-select" class="form-select">
+              </select>
+          </div>
+        </div>
+
+        <hr class="form-divider">
+
         <div class="form-group">
           <label for="med-name" class="form-label">1. お薬の名前</label>
           <input type="text" id="med-name" class="form-input" placeholder="例：メディログ錠 10mg">
@@ -52,42 +68,72 @@
               <input type="date" id="med-start-date" class="form-input">
             </div>
             <div>
-              <span class="sub-label">終了日（永続なら空欄）</span>
+              <span class="sub-label">終了日（残薬の寿命・空欄可）</span>
               <input type="date" id="med-end-date" class="form-input" placeholder="永続的に服用">
             </div>
           </div>
-          <p class="form-hint">※終了日を指定しない場合は、その後も永続的にカレンダーに表示されます。</p>
+          <p class="form-hint">※終了日を指定すると残薬管理に役立ち、診察時の残薬調整がスムーズになります。</p>
+        </div>
+
+        <div id="schedule-group" class="form-group">
+          <label class="form-label">3. 服用のスケジュール</label>
+          <div class="schedule-radio-group">
+            <label class="schedule-radio-label"><input type="radio" name="med-period-type" value="daily" checked> 毎日</label>
+            <label class="schedule-radio-label"><input type="radio" name="med-period-type" value="weekly"> 曜日で指定</label>
+            <label class="schedule-radio-label"><input type="radio" name="med-period-type" value="interval"> 日数おき（隔日など）</label>
+          </div>
+
+          <div id="schedule-weekly-area" class="hidden">
+            <span class="sub-label" style="margin-top: 10px;">のむ曜日を選択してください（複数選択可）</span>
+            <div class="weekday-checkboxes-grid">
+              <label class="weekday-btn"><input type="checkbox" value="0">日</label>
+              <label class="weekday-btn"><input type="checkbox" value="1">月</label>
+              <label class="weekday-btn"><input type="checkbox" value="2">火</label>
+              <label class="weekday-btn"><input type="checkbox" value="3">水</label>
+              <label class="weekday-btn"><input type="checkbox" value="4">木</label>
+              <label class="weekday-btn"><input type="checkbox" value="5">金</label>
+              <label class="weekday-btn"><input type="checkbox" value="6">土</label>
+            </div>
+          </div>
+
+          <div id="schedule-interval-area" class="hidden">
+            <span class="sub-label" style="margin-top: 10px;">服用の間隔</span>
+            <div class="input-unit-wrapper">
+              <input type="number" id="med-interval-days" class="form-input" min="2" value="2">
+              <span class="input-unit-text">日おきにのむ</span>
+            </div>
+          </div>
         </div>
 
         <div class="form-group">
-          <label for="med-frequency" class="form-label">3. 1日の服用回数</label>
+          <label for="med-frequency" class="form-label">4. 1日の服用回数</label>
           <select id="med-frequency" class="form-select">
             <option value="">選択してください</option>
             <option value="3">1日3回（朝・昼・夕など）</option>
             <option value="2">1日2回（朝・夕など）</option>
             <option value="1">1日1回（朝のみ・眠前など）</option>
-            <option value="tonyo">頓用（痛いとき・眠れないときなど）</option>
+            <option value="tonyo">頓用（症状があるとき・たいへんなときなど）</option>
             <option value="free">フリー記載（特殊な用法）</option>
           </select>
         </div>
 
         <div id="detail-usage-group" class="form-group hidden">
-          <label for="med-detail-usage" class="form-label">4. 服用の詳しいタイミング</label>
+          <label for="med-detail-usage" class="form-label">5. 服用の詳しいタイミング</label>
           <select id="med-detail-usage" class="form-select">
             </select>
         </div>
 
         <div id="free-input-group" class="form-group hidden">
-          <label for="med-free-usage" class="form-label">4. 具体的な用法を入力してください</label>
-          <input type="text" id="med-free-usage" class="form-input" placeholder="例：14時のおやつ時、リハビリの前、など">
+          <label for="med-free-usage" class="form-label">5. 具体的な用法を入力してください</label>
+          <input type="text" id="med-free-usage" class="form-input" placeholder="例:14時のおやつ時、リハビリの前、など">
         </div>
 
         <div id="dosage-group" class="form-group hidden">
-          <label class="form-label">5. 1回にのむ量</label>
+          <label class="form-label">6. 1回にのむ量</label>
           
           <div id="dosage-uniform-area">
             <div class="input-unit-wrapper">
-              <input type="number" id="med-dosage-uniform" class="form-input" step="0.1" min="0.1" value="1" placeholder="例：1">
+              <input type="number" id="med-dosage-uniform" class="form-input" step="0.1" min="0.1" value="1">
               <span class="input-unit-text">錠 / カプセル / 包</span>
             </div>
           </div>
@@ -98,7 +144,6 @@
           </label>
 
           <div id="dosage-variable-area" class="hidden">
-            <p class="form-hint" style="margin-bottom: 10px;">※のまない時間帯は「0」にするか空欄のままで大丈夫です。</p>
             <div class="variable-inputs-grid">
               <div id="v-input-morning" class="v-input-box hidden">
                 <span class="sub-label">🌅 朝の量</span>
@@ -120,14 +165,19 @@
           </div>
         </div>
 
-        <div id="time-category-group" class="form-group hidden">
-          <label class="form-label">6. 該当する時間帯（複数選択可）</label>
-          <p class="form-hint">※介助者や家族が「どの時間帯のお薬か」を判別するための重要な分類です。</p>
-          <div class="category-checkboxes">
-            <label class="category-label"><input type="checkbox" value="morning" id="check-morning"> 朝（あさ）</label>
-            <label class="category-label"><input type="checkbox" value="noon" id="check-noon"> 昼（ひる）</label>
-            <label class="category-label"><input type="checkbox" value="evening" id="check-evening"> 夕（ゆう）</label>
-            <label class="category-label"><input type="checkbox" value="bedtime" id="check-bedtime"> 眠前（みんぜん）</label>
+        <div id="tonyo-actual-time-group" class="form-group hidden">
+          <label class="form-label">7. 服用した時刻の記録（後追い）</label>
+          <p class="form-hint">※症状に合わせて実際に服用した「時刻」を入力してください。</p>
+          <div class="time-picker-flex">
+            <div class="time-input-unit">
+              <input type="number" id="tonyo-actual-hour" class="form-input text-center" min="0" max="23" value="12">
+              <span class="sub-label text-center">時</span>
+            </div>
+            <div class="time-input-separator">:</div>
+            <div class="time-input-unit">
+              <input type="number" id="tonyo-actual-minute" class="form-input text-center" min="0" max="59" value="00">
+              <span class="sub-label text-center">分</span>
+            </div>
           </div>
         </div>
 
