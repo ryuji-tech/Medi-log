@@ -25,7 +25,7 @@ const DEFAULT_MEDICINE_MASTER = [
   },
   {
     id: "master_002",
-    name: "ライトアムロジピン カプセル",
+    name: "メディログカプセル 20mg",
     status: "active",
     periodType: "daily", targetDays: [], intervalDays: 0, frequency: "1", detailUsageText: "朝食後",
     dosages: { morning: "1", noon: "0", evening: "0", bedtime: "0" },
@@ -203,7 +203,7 @@ function renderCalendar(year, month) {
 
         // 💡 2. カルテのHTML中身の生成（開いたままで中身だけが瞬時に切り替わる）
         const todaysMeds = getMedicinesForDay(year, month, day);
-        let html = `<h3 class="accordion-title">💊 ${month}月${day}日（${dayOfWeek}）の服薬インラインカルテ</h3>`;
+        let html = `<h3 class="accordion-title">💊 ${month}月${day}日（${dayOfWeek}）の服薬予定</h3>`;
 
         if (todaysMeds.length === 0) {
           html += `<p class="no-medicine-msg">🌟 この日に服用するお薬の予定はありません。</p>`;
@@ -540,7 +540,7 @@ renderCalendar(currentYear, currentMonth);
 document.getElementById("floating-clear-btn").addEventListener("click", () => {
   const guidanceMessage = 
     "デモページを触ってくれてありがとうございます。\n" +
-    "次の操作で端末内の登録データを安全に削除することができます。\n" +
+    "OKを押下すると端末内の登録データを安全に削除することができます。\n" +
     "必要に応じて検証終了時に登録データの削除を行ってください。\n\n" +
     "このブラウザに保存されているアプリのデータをすべて消去し、初期状態に戻しますか？";
 
