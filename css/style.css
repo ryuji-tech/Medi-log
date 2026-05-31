@@ -1,335 +1,324 @@
 /* ==========================================================================
-   1. アプリケーション共通デザイン（ベース・フォント定義）
+   Base & Layout System
    ========================================================================== */
-
+* { box-sizing: border-box; }
 body {
-  background-color: #fafafa; 
-  background-image: linear-gradient(to bottom, #ffffff 0%, #f5f5f5 100%);
-  background-attachment: fixed;
+  background-color: #fafafa;
   font-family: 'Noto Sans JP', sans-serif;
   margin: 0;
   padding: 0;
+  color: #334155;
 }
 
 #app {
-  position: relative;
   width: 100%;
   min-height: 100vh;
-  overflow-x: hidden;
+  padding: 20px 10px;
 }
 
-/* ==========================================================================
-   2. カレンダー外殻コンテナ ＆ 右下浮遊（＋）ボタン
-   ========================================================================== */
-
+/* 📅 カレンダーメインカード */
 .calendar-card {
-  position: relative; 
+  position: relative;
   max-width: 400px;
-  margin: 60px auto;
+  margin: 20px auto 40px auto;
   background-color: #ffffff;
-  padding: 28px;
-  border-radius: 8px;
-  box-shadow: 
-    0 0 0 1px rgba(0, 0, 0, 0.02),
-    0 1px 3px rgba(0, 0, 0, 0.05),
-    0 10px 30px rgba(0, 0, 0, 0.04);
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+  /* ✨ フローティングドック分の底面安全マージン */
+  padding-bottom: 96px; 
 }
 
+/* ヘッダーUI */
 #calendar-header-ui {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-bottom: 20px;
-  border-bottom: 1px dashed #f0f0f0;
-  margin-bottom: 16px;
+  margin-bottom: 24px;
 }
-
 #calendar-title {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
-  color: #2c2c2c;
+  color: #1e293b;
   margin: 0;
 }
-
 .nav-btn {
-  background: none;
-  border: 1px solid #e8e8e8;
-  border-radius: 4px;
-  width: 32px;
-  height: 32px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
   cursor: pointer;
-  font-size: 16px;
-  color: #666;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.2s;
+  font-weight: 700;
+  color: #64748b;
+  transition: background 0.2s;
 }
-.nav-btn:hover {
-  background-color: #f5f5f5;
-}
-
-#floating-register-btn {
-  position: absolute;
-  bottom: -20px;  
-  right: 20px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%; 
-  background-color: #2c2c2c; 
-  color: #ffffff;
-  font-size: 28px;
-  font-weight: 400;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
-  z-index: 10; 
-}
-#floating-register-btn:hover {
-  background-color: #444444;
-  transform: translateY(-2px); 
-}
+.nav-btn:hover { background: #f8fafc; }
 
 /* ==========================================================================
-   3. カレンダーグリッド ＆ 当日アクセント
+   Calendar Grid & Day Cells
    ========================================================================== */
-
 #calendar-container {
   display: flex;
   flex-direction: column;
   width: 100%;
 }
-
-.calendar-week-row {
+.calendar-header-row, .calendar-week-row {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   width: 100%;
-  gap: 8px 0;
 }
-
-.calendar-header-row {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  width: 100%;
-  margin-bottom: 12px;
-  border-bottom: 1px solid #f0f2f5;
-  padding-bottom: 4px;
-}
-
+.calendar-header-row { margin-bottom: 12px; }
 .calendar-header {
   text-align: center;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
-  color: #7d8590;
-  padding: 8px 0;
+  color: #94a3b8;
+  padding: 4px 0;
 }
-.calendar-header.saturday { color: #2b6cb0; }
-.calendar-header.sunday   { color: #c53030; }
 
-.calendar-day, .calendar-day-blank, .calendar-day.empty {
+.calendar-day {
   aspect-ratio: 1 / 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;       
-  font-weight: 500;      
-  box-sizing: border-box;
-}
-
-.calendar-day {
-  position: relative; 
-  color: #2c2c2c;
+  font-size: 15px;
+  font-weight: 500;
+  position: relative;
   cursor: pointer;
-  border-radius: 8px;
-  transition: background-color 0.2s, transform 0.1s;
+  border-radius: 10px;
+  margin: 3px;
+  color: #334155;
+  transition: background 0.15s;
 }
-.calendar-day:hover { background-color: #f0f2f5; }
+.calendar-day:hover:not(.empty) { background-color: #f1f5f9; }
+.calendar-day.empty { cursor: default; }
 
-/* 今日の日付マスのやんわりアクセント */
+/* 今日のアクセント */
 .calendar-day.is-today {
-  background-color: #f0fdf4; 
+  background-color: #f0fdf4;
   font-weight: 700;
-  border: 1px solid #bbf7d0; 
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
 }
-
-.calendar-day-blank, .calendar-day.empty {
-  background-color: transparent;
-  border: none;
-  pointer-events: none;
-}
-
+/* 服薬ありドットポインター */
 .calendar-day.has-med::after {
   content: "";
   position: absolute;
-  bottom: 6px;       
+  bottom: 6px;
   left: 50%;
   transform: translateX(-50%);
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background-color: #10b981; 
+  background-color: #10b981;
 }
 
 /* ==========================================================================
-   4. インライン・アコーディオン（カルテ表示）
+   ✨ Inline Accordion Panel (服薬カルテ)
    ========================================================================== */
-
 .accordion-panel {
-  width: 100%;
-  background-color: #fafafa;
-  overflow: hidden;
+  grid-column: span 7; /* 横幅いっぱいに広げる */
   max-height: 0;
-  opacity: 0;
-  box-sizing: border-box;
+  overflow: hidden;
+  background-color: #f8fafc;
+  border-radius: 12px;
   padding: 0 16px;
-  transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease-out;
+  transition: max-height 0.25s ease-out, padding 0.25s ease-out, margin 0.25s ease-out;
+  margin: 0;
 }
-
+/* 開いた時の動的クラス */
 .accordion-panel.is-open {
-  max-height: 550px; 
-  opacity: 1;
-  padding: 18px 16px;
-  margin: 8px 0;
-  background-color: #ffffff;
-  border-top: 1px dashed #eef0f2;
-  border-bottom: 1px dashed #eef0f2;
-  overflow-y: auto; 
+  max-height: 1200px; /* 必要十分な拡張高さ */
+  padding: 20px 16px;
+  margin: 8px 0 14px 0;
+  border: 1px solid #e2e8f0;
 }
 
 .accordion-title {
-  font-size: 15px;
+  margin: 0 0 16px 0;
+  font-size: 14px;
   font-weight: 700;
-  color: #2c2c2c;
-  margin-top: 0;
-  margin-bottom: 16px;
+  color: #1e293b;
+  border-left: 3px solid #10b981;
+  padding-left: 8px;
 }
+.no-medicine-msg { font-size: 13px; color: #64748b; margin: 0; text-align: center; padding: 10px 0; }
 
-.time-category-section { margin-bottom: 18px; }
-
-.time-category-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  font-weight: 700;
-  color: #475569;
-  margin-bottom: 8px;
-  padding-bottom: 4px;
-  border-bottom: 1px solid #f1f5f9;
-}
-
-.med-check-list { display: flex; flex-direction: column; gap: 8px; }
+/* カテゴリ・チェックリスト構造 */
+.time-category-section { margin-bottom: 16px; }
+.time-category-section:last-child { margin-bottom: 0; }
+.time-category-header { font-size: 12px; font-weight: 700; color: #0f172a; margin-bottom: 8px; }
+.med-check-list { display: flex; flex-direction: column; gap: 6px; }
 
 .med-check-item {
   display: flex;
-  align-items: center;
-  padding: 12px 14px;
-  background-color: #f8fafc;
+  align-items: flex-start;
+  gap: 10px;
+  background: #ffffff;
+  padding: 10px 12px;
+  border-radius: 8px;
   border: 1px solid #e2e8f0;
-  border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.15s;
 }
-
-.med-check-item.is-checked {
-  background-color: #ecfdf5; 
-  border-color: #a7f3d0;
-}
-.med-check-item.is-checked .med-check-text {
-  color: #059669;
-  text-decoration: line-through; 
-  opacity: 0.6;
-}
-
-.med-checkbox { width: 20px; height: 20px; margin-right: 12px; cursor: pointer; }
-.med-check-info { display: flex; flex-direction: column; flex: 1; }
-.med-check-text { font-size: 14px; font-weight: 700; color: #1e293b; }
-.med-check-subtext { font-size: 12px; color: #64748b; margin-top: 2px; }
-.no-medicine-msg { text-align: center; padding: 16px 0; color: #94a3b8; font-size: 14px; }
+.med-checkbox { width: 16px; height: 16px; margin-top: 2px; cursor: pointer; }
+.med-check-info { display: flex; flex-direction: column; }
+.med-check-text { font-size: 13px; font-weight: 500; color: #334155; }
+.med-check-subtext { font-size: 11px; color: #64748b; margin-top: 2px; }
 
 /* ==========================================================================
-   5. ボトムシートフォーム ＆ 流用・時刻UI拡張
+   📥 右下フローティング・アクションドック
    ========================================================================== */
-
-#bottom-sheet-overlay {
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background-color: rgba(0, 0, 0, 0.4); 
-  opacity: 0; pointer-events: none; transition: opacity 0.3s ease; z-index: 100; 
+.floating-actions-container {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 90;
 }
-#bottom-sheet-overlay.is-active { opacity: 1; pointer-events: auto; }
+.dock-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.12);
+  transition: transform 0.2s, background-color 0.2s;
+}
+.dock-btn:hover { transform: translateY(-2px); }
 
-#register-bottom-sheet {
-  position: fixed; bottom: 0; left: 50%;
-  transform: translate(-50%, 100%); 
-  width: 100%; max-width: 440px; height: 85vh;     
+/* 主ボタン（＋） */
+.primary-dock { background-color: #1e293b; color: #ffffff; font-size: 22px; }
+.primary-dock:hover { background-color: #0f172a; }
+
+/* 副ボタン（📋） */
+.secondary-dock { background-color: #ffffff; color: #334155; border: 1px solid #e2e8f0; }
+.secondary-dock:hover { background-color: #f8fafc; }
+
+/* ==========================================================================
+   📋 履歴・一覧モーダル（サイドシート風）
+   ========================================================================== */
+.side-sheet-modal {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background-color: rgba(15, 23, 42, 0.4); display: flex; align-items: center;
+  justify-content: center; z-index: 200;
+}
+.sheet-modal-content {
   background-color: #ffffff;
-  border-top-left-radius: 20px; border-top-right-radius: 20px;
-  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.12);
-  display: flex; flex-direction: column;
-  transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1); z-index: 101; 
+  width: 92%;
+  max-width: 420px;
+  height: 84vh;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+  animation: modalUp 0.25s ease-out;
 }
-#register-bottom-sheet.is-open { transform: translate(-50%, 0); }
+@keyframes modalUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-.sheet-handle { width: 40px; height: 5px; background-color: #e0e0e0; border-radius: 3px; margin: 12px auto 4px auto; }
-.sheet-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 24px; border-bottom: 1px solid #f0f0f0; }
-.sheet-title { font-size: 17px; font-weight: 700; color: #2c2c2c; margin: 0; }
-#close-register-btn { background: none; border: none; font-size: 28px; color: #999; cursor: pointer; }
-.sheet-body { flex: 1; overflow-y: auto; padding: 24px; box-sizing: border-box; }
+.sheet-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; border-bottom: 1px solid #f1f5f9;
+}
+.sheet-title { font-size: 15px; font-weight: 700; color: #1e293b; margin: 0; }
+.close-x-btn { background: none; border: none; font-size: 22px; color: #94a3b8; cursor: pointer; }
+.sheet-body { flex: 1; overflow-y: auto; padding: 20px; }
+.list-section-title { font-size: 12px; font-weight: 700; color: #059669; margin: 0 0 12px 0; letter-spacing: 0.5px; }
 
-.form-group { margin-bottom: 20px; }
-.form-divider { border: 0; border-top: 1px solid #f0f0f0; margin: 20px 0; }
-
-/* ✨ 流用ボックス用の堅実な外枠 */
-.master-stream-box {
+/* 医薬品カードマスタ */
+.med-master-card {
   background-color: #f8fafc;
   border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 14px;
+  margin-bottom: 10px;
+}
+.med-master-card-header { display: flex; justify-content: space-between; align-items: flex-start; }
+.med-master-card-title { font-size: 13px; font-weight: 700; color: #334155; }
+.med-master-card-meta { font-size: 11px; color: #64748b; background: #fff; padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; }
+.med-master-action-row { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; border-top: 1px dashed #e2e8f0; padding-top: 8px; }
+.btn-action-small { padding: 5px 10px; font-size: 11px; font-weight: 500; border: 1px solid #cbd5e1; border-radius: 6px; cursor: pointer; background: #fff; color: #475569; }
+.btn-action-small:hover { background: #f8fafc; }
+
+/* ==========================================================================
+   🛑 終了日設定ミニダイアログ
+   ========================================================================== */
+.mini-dialog-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background-color: rgba(15, 23, 42, 0.5); display: flex; align-items: center;
+  justify-content: center; z-index: 300;
+}
+.mini-dialog-box {
+  background: #ffffff; padding: 20px; border-radius: 14px; width: 88%; max-width: 320px;
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+}
+.mini-dialog-box h4 { margin: 0 0 6px 0; font-size: 14px; color: #1e293b; font-weight: 700; }
+.mini-dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+
+/* ==========================================================================
+   💊 お薬登録ボトムシート構造（完全復元）
+   ========================================================================== */
+#register-bottom-sheet {
+  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%) translateY(100%);
+  width: 100%; max-width: 440px; height: 84vh; background: #ffffff;
+  border-top-left-radius: 20px; border-top-right-radius: 20px;
+  transition: transform 0.28s cubic-bezier(0.32, 0.94, 0.6, 1); z-index: 250;
+  display: flex; flex-direction: column;
+  box-shadow: 0 -10px 30px rgba(15, 23, 42, 0.08);
+}
+#register-bottom-sheet.is-open { transform: translateX(-50%) translateY(0); }
+
+#bottom-sheet-overlay {
+  position: fixed; top:0; left:0; width:100%; height:100%;
+  background: rgba(15, 23, 42, 0.4); opacity:0; pointer-events:none;
+  transition: opacity 0.25s; z-index: 240;
+}
+#bottom-sheet-overlay.is-active { opacity:1; pointer-events:auto; }
+
+.sheet-handle {
+  width: 36px; height: 5px; background-color: #cbd5e1; border-radius: 3px;
+  margin: 10px auto 2px auto; flex-shrink: 0;
 }
 
-.form-label { display: block; font-size: 14px; font-weight: 700; color: #2c2c2c; margin-bottom: 8px; }
-.sub-label { display: block; font-size: 12px; color: #475569; margin-bottom: 6px; }
-.form-hint { font-size: 12px; color: #64748b; margin-top: 6px; line-height: 1.4; }
-
+/* フォーム内製パーツ */
+.form-group { margin-bottom: 18px; display: flex; flex-direction: column; }
+.form-label { font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 8px; }
 .form-input, .form-select {
-  width: 100%; height: 46px; padding: 0 14px; font-size: 15px; font-family: inherit;
-  border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; background-color: #ffffff;
+  width: 100%; padding: 10px 12px; font-size: 13px; border: 1px solid #cbd5e1;
+  border-radius: 8px; background-color: #fff; color: #334155; outline: none;
 }
-.form-input:focus, .form-select:focus { outline: none; border-color: #1e293b; box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.04); }
+.form-input:focus, .form-select:focus { border-color: #1e293b; }
+.form-divider { border: 0; border-top: 1px solid #f1f5f9; margin: 16px 0; }
+.required-tag { font-size: 10px; color: #ef4444; background: #fef2f2; padding: 1px 4px; border-radius: 4px; margin-left: 4px; }
+.form-hint { font-size: 11px; color: #64748b; margin: 0; }
 
-.duration-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.schedule-radio-group { display: flex; gap: 14px; }
-.schedule-radio-label { display: flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer; }
+.master-stream-box { background-color: #f8fafc; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; }
+.duration-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.sub-label { font-size: 11px; color: #64748b; display: block; margin-bottom: 4px; }
 
-.weekday-checkboxes-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 8px; }
+/* ラジオ・チェックボックスタグ */
+.schedule-radio-group { display: flex; flex-wrap: wrap; gap: 12px; }
+.schedule-radio-label { font-size: 12px; display: flex; align-items: center; gap: 4px; cursor: pointer; }
+
+.weekday-checkboxes-grid { display: flex; flex-wrap: wrap; gap: 6px; }
 .weekday-btn {
-  display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 0;
-  background-color: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; cursor: pointer;
+  font-size: 12px; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px;
+  background: #fff; cursor: pointer; display: flex; align-items: center; gap: 4px;
 }
+.input-unit-wrapper { display: flex; align-items: center; gap: 8px; }
+.input-unit-text { font-size: 12px; color: #475569; }
 
-.input-unit-wrapper { position: relative; display: flex; align-items: center; }
-.input-unit-wrapper .form-input { padding-right: 140px; }
-.input-unit-text { position: absolute; right: 16px; font-size: 13px; color: #64748b; }
-
-.variable-dosage-switch { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 13px; color: #475569; cursor: pointer; }
-.variable-inputs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background-color: #f8fafc; padding: 12px; border-radius: 6px; border: 1px dashed #cbd5e1; margin-top: 8px; }
-.v-input-box { display: flex; flex-direction: column; }
-
-/* ✨【新設】後追い時刻入力用の並びスタイル */
-.time-picker-flex { display: flex; align-items: center; gap: 8px; max-width: 200px; margin-top: 6px; }
-.time-input-unit { flex: 1; display: flex; flex-direction: column; }
-.time-input-separator { font-size: 20px; font-weight: 700; color: #475569; padding-bottom: 20px; }
-.text-center { text-align: center; }
-
-#submit-register-btn {
-  width: 100%; height: 50px; background-color: #1e293b; color: #ffffff;
-  border: none; border-radius: 6px; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 12px; margin-bottom: 24px;
+.submit-btn {
+  background-color: #1e293b; color:#fff; border:none; padding:12px;
+  font-size:14px; font-weight:700; border-radius:8px; cursor:pointer; margin-top:10px;
 }
-#submit-register-btn:hover { background-color: #0f172a; }
+.submit-btn:hover { background-color:#0f172a; }
 
+/* 共通非表示ユーティリティ */
 .hidden { display: none !important; }

@@ -1,193 +1,331 @@
 <!DOCTYPE html>
+
 <html lang="ja">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Medi-log（メディログ）｜お薬服用管理カレンダー</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Medi-log（メディログ 〜あなたの服薬管理をサポート〜）</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Damion&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="css/style.css">
+
 </head>
+
 <body>
 
-  <div id="app">
 
-    <div class="calendar-card">
 
-      <div id="calendar-header-ui">
-        <button id="prev-month-btn" class="nav-btn" aria-label="先月へ">&lt;</button>
-        <h2 id="calendar-title"></h2>
-        <button id="next-month-btn" class="nav-btn" aria-label="来月へ">&gt;</button>
-      </div>    
+<div id="app">
 
-      <div id="calendar-container"></div>
+<header class="app-header">
 
-      <button id="floating-register-btn" aria-label="新しいお薬を登録する">＋</button>
+<h1 class="app-title">Medi-log</h1>
 
-    </div>
+</header>
 
-    <div id="bottom-sheet-overlay"></div>
+<div class="calendar-card">
 
-    <div id="register-bottom-sheet">
-      <div class="sheet-handle"></div>
-      
-      <div class="sheet-header">
-        <h3 class="sheet-title">💊 お薬情報の登録</h3>
-        <button id="close-register-btn" aria-label="閉じる">×</button>
-      </div>
 
-      <div class="sheet-body">
-        
-        <div class="form-group master-stream-box">
-          <label class="form-label">登録方式の選択</label>
-          <div class="schedule-radio-group" style="margin-bottom: 12px;">
-            <label class="schedule-radio-label"><input type="radio" name="register-mode" value="new" checked> 新しく入力する</label>
-            <label class="schedule-radio-label"><input type="radio" name="register-mode" value="quote"> 登録済みの医薬品から流用する</label>
-          </div>
-          
-          <div id="quote-selector-area" class="hidden">
-            <span class="sub-label">流用（引用）する医薬品を選択してください</span>
-            <select id="quote-medicine-select" class="form-select">
-              </select>
-          </div>
-        </div>
 
-        <hr class="form-divider">
+<div id="calendar-header-ui">
 
-        <div class="form-group">
-          <label for="med-name" class="form-label">1. お薬の名前</label>
-          <input type="text" id="med-name" class="form-input" placeholder="例：メディログ錠 10mg">
-        </div>
+<button id="prev-month-btn" class="nav-btn" aria-label="先月へ">&lt;</button>
 
-        <div class="form-group">
-          <label class="form-label">2. 服用期間</label>
-          <div class="duration-inputs">
-            <div>
-              <span class="sub-label">開始日（必須）</span>
-              <input type="date" id="med-start-date" class="form-input">
-            </div>
-            <div>
-              <span class="sub-label">終了日（残薬の寿命・空欄可）</span>
-              <input type="date" id="med-end-date" class="form-input" placeholder="永続的に服用">
-            </div>
-          </div>
-          <p class="form-hint">※終了日を指定すると残薬管理に役立ち、診察時の残薬調整がスムーズになります。</p>
-        </div>
+<h2 id="calendar-title">2026年 5月</h2>
 
-        <div id="schedule-group" class="form-group">
-          <label class="form-label">3. 服用のスケジュール</label>
-          <div class="schedule-radio-group">
-            <label class="schedule-radio-label"><input type="radio" name="med-period-type" value="daily" checked> 毎日</label>
-            <label class="schedule-radio-label"><input type="radio" name="med-period-type" value="weekly"> 曜日で指定</label>
-            <label class="schedule-radio-label"><input type="radio" name="med-period-type" value="interval"> 日数おき（隔日など）</label>
-          </div>
+<button id="next-month-btn" class="nav-btn" aria-label="来月へ">&gt;</button>
 
-          <div id="schedule-weekly-area" class="hidden">
-            <span class="sub-label" style="margin-top: 10px;">のむ曜日を選択してください（複数選択可）</span>
-            <div class="weekday-checkboxes-grid">
-              <label class="weekday-btn"><input type="checkbox" value="0">日</label>
-              <label class="weekday-btn"><input type="checkbox" value="1">月</label>
-              <label class="weekday-btn"><input type="checkbox" value="2">火</label>
-              <label class="weekday-btn"><input type="checkbox" value="3">水</label>
-              <label class="weekday-btn"><input type="checkbox" value="4">木</label>
-              <label class="weekday-btn"><input type="checkbox" value="5">金</label>
-              <label class="weekday-btn"><input type="checkbox" value="6">土</label>
-            </div>
-          </div>
+</div>
 
-          <div id="schedule-interval-area" class="hidden">
-            <span class="sub-label" style="margin-top: 10px;">服用の間隔</span>
-            <div class="input-unit-wrapper">
-              <input type="number" id="med-interval-days" class="form-input" min="2" value="2">
-              <span class="input-unit-text">日おきにのむ</span>
-            </div>
-          </div>
-        </div>
 
-        <div class="form-group">
-          <label for="med-frequency" class="form-label">4. 1日の服用回数</label>
-          <select id="med-frequency" class="form-select">
-            <option value="">選択してください</option>
-            <option value="3">1日3回（朝・昼・夕など）</option>
-            <option value="2">1日2回（朝・夕など）</option>
-            <option value="1">1日1回（朝のみ・眠前など）</option>
-            <option value="tonyo">頓用（症状があるとき・たいへんなときなど）</option>
-            <option value="free">フリー記載（特殊な用法）</option>
-          </select>
-        </div>
 
-        <div id="detail-usage-group" class="form-group hidden">
-          <label for="med-detail-usage" class="form-label">5. 服用の詳しいタイミング</label>
-          <select id="med-detail-usage" class="form-select">
-            </select>
-        </div>
+<div id="calendar-container"></div>
 
-        <div id="free-input-group" class="form-group hidden">
-          <label for="med-free-usage" class="form-label">5. 具体的な用法を入力してください</label>
-          <input type="text" id="med-free-usage" class="form-input" placeholder="例:14時のおやつ時、リハビリの前、など">
-        </div>
 
-        <div id="dosage-group" class="form-group hidden">
-          <label class="form-label">6. 1回にのむ量</label>
-          
-          <div id="dosage-uniform-area">
-            <div class="input-unit-wrapper">
-              <input type="number" id="med-dosage-uniform" class="form-input" step="0.1" min="0.1" value="1">
-              <span class="input-unit-text">錠 / カプセル / 包</span>
-            </div>
-          </div>
 
-          <label class="variable-dosage-switch" id="variable-dosage-switch-label">
-            <input type="checkbox" id="toggle-variable-dosage">
-            <span>朝・昼・夕などで、のむ量が違う場合はこちら</span>
-          </label>
+<div class="floating-actions-container">
 
-          <div id="dosage-variable-area" class="hidden">
-            <div class="variable-inputs-grid">
-              <div id="v-input-morning" class="v-input-box hidden">
-                <span class="sub-label">🌅 朝の量</span>
-                <input type="number" id="dosage-m" class="form-input" step="0.1" min="0" placeholder="0">
-              </div>
-              <div id="v-input-noon" class="v-input-box hidden">
-                <span class="sub-label">☀️ 昼の量</span>
-                <input type="number" id="dosage-n" class="form-input" step="0.1" min="0" placeholder="0">
-              </div>
-              <div id="v-input-evening" class="v-input-box hidden">
-                <span class="sub-label">🌌 夕の量</span>
-                <input type="number" id="dosage-e" class="form-input" step="0.1" min="0" placeholder="0">
-              </div>
-              <div id="v-input-bedtime" class="v-input-box hidden">
-                <span class="sub-label">🌙 眠前の量</span>
-                <input type="number" id="dosage-b" class="form-input" step="0.1" min="0" placeholder="0">
-              </div>
-            </div>
-          </div>
-        </div>
+<button id="floating-clear-btn" class="dock-btn danger-dock" aria-label="デモデータをすべて消去">🗑️</button>
 
-        <div id="tonyo-actual-time-group" class="form-group hidden">
-          <label class="form-label">7. 服用した時刻の記録（後追い）</label>
-          <p class="form-hint">※症状に合わせて実際に服用した「時刻」を入力してください。</p>
-          <div class="time-picker-flex">
-            <div class="time-input-unit">
-              <input type="number" id="tonyo-actual-hour" class="form-input text-center" min="0" max="23" value="12">
-              <span class="sub-label text-center">時</span>
-            </div>
-            <div class="time-input-separator">:</div>
-            <div class="time-input-unit">
-              <input type="number" id="tonyo-actual-minute" class="form-input text-center" min="0" max="59" value="00">
-              <span class="sub-label text-center">分</span>
-            </div>
-          </div>
-        </div>
+<button id="floating-master-btn" class="dock-btn secondary-dock" aria-label="お薬一覧・処方履歴">📋</button>
 
-        <button id="submit-register-btn">この内容でお薬を登録する</button>
+<button id="floating-register-btn" class="dock-btn primary-dock" aria-label="新しいお薬を登録">＋</button>
 
-      </div>
-    </div>
+</div>
 
-  </div>
 
-  <script src="js/app.js"></script>
+
+</div>
+
+
+
+<div id="master-list-sheet" class="side-sheet-modal hidden">
+
+<div class="sheet-modal-content">
+
+<div class="sheet-header">
+
+<h3 class="sheet-title">📋 登録医薬品の一覧・処方履歴</h3>
+
+<button id="close-master-list-btn" class="close-x-btn" aria-label="閉じる">×</button>
+
+</div>
+
+<div class="sheet-body">
+
+<h4 class="list-section-title">🟢 現在服用中のお薬（有効期間内）</h4>
+
+<div id="active-meds-list" class="med-master-list-group"></div>
+
+
+
+<h4 class="list-section-title" style="margin-top: 28px; color: #64748b;">📁 過去に使用した医薬品リスト</h4>
+
+<div id="inactive-meds-list" class="med-master-list-group"></div>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<div id="stop-date-modal" class="mini-dialog-overlay hidden">
+
+<div class="mini-dialog-box">
+
+<h4>🛑 服用終了日の設定</h4>
+
+<p class="form-hint">このお薬の服用を終了した（する）日付を選択してください。</p>
+
+<input type="date" id="stop-med-date-input" class="form-input" style="margin: 16px 0;">
+
+<div class="mini-dialog-actions">
+
+<button id="cancel-stop-btn" class="btn-action-small">キャンセル</button>
+
+<button id="confirm-stop-btn" class="btn-action-small" style="background-color:#df2a2a; color:#fff; border:none; font-weight:700;">この日で終了する</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<div id="bottom-sheet-overlay"></div>
+
+<div id="register-bottom-sheet">
+
+<div class="sheet-handle"></div>
+
+<div class="sheet-header">
+
+<h3 class="sheet-title">💊 お薬情報の登録</h3>
+
+<button id="close-register-btn" class="close-x-btn" aria-label="閉じる">×</button>
+
+</div>
+
+<div class="sheet-body">
+
+
+<div class="form-group master-stream-box">
+
+<label class="form-label">登録方式の選択</label>
+
+<div class="schedule-radio-group">
+
+<label class="schedule-radio-label"><input type="radio" name="register-mode" value="new" checked> 新しく入力する</label>
+
+<label class="schedule-radio-label"><input type="radio" name="register-mode" value="quote"> 既存の薬から流用（コピー新規）</label>
+
+</div>
+
+<div id="quote-selector-area" class="hidden" style="margin-top:12px;">
+
+<select id="quote-medicine-select" class="form-select"></select>
+
+</div>
+
+</div>
+
+
+
+<hr class="form-divider">
+
+
+
+<div class="form-group">
+
+<label for="med-name" class="form-label">1. お薬の名前 <span class="required-tag">必須</span></label>
+
+<input type="text" id="med-name" class="form-input" placeholder="例：メディログ錠 10mg">
+
+</div>
+
+
+
+<div class="form-group">
+
+<label class="form-label">2. 服用期間 <span class="required-tag">必須</span></label>
+
+<div class="duration-inputs">
+
+<div><span class="sub-label">開始日</span><input type="date" id="med-start-date" class="form-input"></div>
+
+<div><span class="sub-label">終了日（空欄可）</span><input type="date" id="med-end-date" class="form-input"></div>
+
+</div>
+
+</div>
+
+
+
+<div id="schedule-group" class="form-group">
+
+<label class="form-label">3. 服用のスケジュール判定</label>
+
+<div class="schedule-radio-group">
+
+<label class="schedule-radio-label"><input type="radio" name="med-period-type" value="daily" checked> 毎日</label>
+
+<label class="schedule-radio-label"><input type="radio" name="med-period-type" value="weekly"> 曜日指定</label>
+
+<label class="schedule-radio-label"><input type="radio" name="med-period-type" value="interval"> 日数おき</label>
+
+</div>
+
+
+<div id="schedule-weekly-area" class="hidden" style="margin-top:12px;">
+
+<div class="weekday-checkboxes-grid">
+
+<label class="weekday-btn"><input type="checkbox" value="1">月</label>
+
+<label class="weekday-btn"><input type="checkbox" value="2">火</label>
+
+<label class="weekday-btn"><input type="checkbox" value="3">水</label>
+
+<label class="weekday-btn"><input type="checkbox" value="4">木</label>
+
+<label class="weekday-btn"><input type="checkbox" value="5">金</label>
+
+<label class="weekday-btn"><input type="checkbox" value="6">土</label>
+
+<label class="weekday-btn"><input type="checkbox" value="0">日</label>
+
+</div>
+
+</div>
+
+
+<div id="schedule-interval-area" class="hidden" style="margin-top:12px;">
+
+<div class="input-unit-wrapper">
+
+<input type="number" id="med-interval-days" class="form-input" min="2" value="2" style="width:80px;">
+
+<span class="input-unit-text">日おきに服用する</span>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<div class="form-group">
+
+<label for="med-frequency" class="form-label">4. 1日の服用回数 <span class="required-tag">必須</span></label>
+
+<select id="med-frequency" class="form-select">
+
+<option value="">選択してください</option>
+
+<option value="3">1日3回 (朝・昼・夕)</option>
+
+<option value="2">1日2回 (朝・夕)</option>
+
+<option value="1">1日1回 (朝)</option>
+
+<option value="tonyo">頓用（症状が出たとき）</option>
+
+</select>
+
+</div>
+
+
+
+<div id="detail-usage-group" class="form-group hidden">
+
+<label for="med-detail-usage" class="form-label">5. 服用の詳しいタイミング</label>
+
+<select id="med-detail-usage" class="form-select"></select>
+
+</div>
+
+
+
+<div id="tonyo-actual-time-group" class="form-group hidden master-stream-box">
+
+<label class="form-label" style="color:#0284c7;">⏱️ 頓用：今回服用した時間</label>
+
+<div style="display:flex; gap:8px; align-items:center;">
+
+<input type="number" id="tonyo-actual-hour" class="form-input" min="0" max="23" value="12" style="width:70px; text-align:center;"> 時
+
+<input type="number" id="tonyo-actual-minute" class="form-input" min="0" max="59" value="00" style="width:70px; text-align:center;"> 分 にのんだ
+
+</div>
+
+</div>
+
+
+
+<div id="dosage-group" class="form-group hidden">
+
+<label class="form-label">6. 1回にのむ量</label>
+
+<div class="input-unit-wrapper">
+
+<input type="number" id="med-dosage-uniform" class="form-input" step="0.5" value="1" style="width:80px;">
+
+<span class="input-unit-text">錠 / カプセル / 包</span>
+
+</div>
+
+</div>
+
+
+
+<button id="submit-register-btn" class="submit-btn">この内容でお薬を登録する</button>
+
+</div>
+
+</div>
+
+
+
+</div>
+
+
+
+<script src="js/app.js"></script>
+
 </body>
+
 </html>
+
