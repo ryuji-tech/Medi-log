@@ -5,6 +5,8 @@
   box-sizing: border-box;
 }
 body {
+  font-family: 'M PLUS Rounded 1c', 'Zen Maru Gothic', sans-serif;
+  /* CSSのフォント指定（font-family）は、「左側に書いたフォントが優先され、そのフォントに存在しない文字（または対応していない文字）があると、右側のフォントが適用される」というルール */
   background-color: #f0fdf4; /* 💡 画像が万が一読み込めないときの極薄の水色・緑ベースの保険 */
 
   /* WebP版を保険として指定 */
@@ -34,7 +36,7 @@ body {
 }
 
 .app-title {
-  font-family: 'Zen Maru Gothic', sans-serif;
+  font-family: 'M PLUS Rounded 1c', 'Zen Maru Gothic', sans-serif;
 
   /* 💡 筆記体は少し小さく見えがちなので、24pxから「32px〜36px」あたりに設定 */
   font-size: 36px;
@@ -62,6 +64,7 @@ body {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
   /* ✨ フローティングドック分の底面安全マージン */
   padding-bottom: 96px;
+  font-family: 'M PLUS Rounded 1c', 'Zen Maru Gothic', sans-serif;
 }
 
 /* ヘッダーUI */
@@ -115,7 +118,7 @@ body {
   font-weight: 700;
   color: #94a3b8;
   padding: 4px 0;
-  font-family: 'Zen Maru Gothic', sans-serif;
+  font-family: 'M PLUS Rounded 1c', 'Zen Maru Gothic', sans-serif;
 }
 
 .calendar-day {
@@ -131,7 +134,7 @@ body {
   margin: 3px;
   color: #334155;
   transition: background 0.15s;
-  font-family: 'Zen Maru Gothic', sans-serif;
+  font-family: 'M PLUS Rounded 1c', 'Zen Maru Gothic', sans-serif;
 }
 .calendar-day:hover:not(.empty) {
   background-color: #f1f5f9;
