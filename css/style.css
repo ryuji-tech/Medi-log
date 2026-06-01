@@ -20,6 +20,7 @@ body {
   background-size: cover;
 }
 
+
 #app {
   width: 100%;
   min-height: 100vh;
@@ -33,14 +34,13 @@ body {
 }
 
 .app-title {
-  /* 💡 フォントを Damion に変更（読み込めない場合の保険にセリフ体・筆記体風を指定） */
-  font-family: "Damion", cursive, serif;
+  font-family: 'Zen Maru Gothic', sans-serif;
 
   /* 💡 筆記体は少し小さく見えがちなので、24pxから「32px〜36px」あたりに設定 */
   font-size: 36px;
-  font-weight: 400; /* Damionは400（Regular）のみのフォントです */
+  font-weight: 700;
 
-  color: #0284c7; /* 清潔感のある水色 */
+  color: #034261; /* 清潔感のある水色 */
   text-align: center;
   /* text-transform: lowercase; 小文字フォルムを固定 */
 
@@ -72,7 +72,7 @@ body {
   margin-bottom: 24px;
 }
 #calendar-title {
-  font-size: 18px;
+  font-size: 24px;
   font-weight: 700;
   color: #1e293b;
   margin: 0;
@@ -111,10 +111,11 @@ body {
 }
 .calendar-header {
   text-align: center;
-  font-size: 12px;
+  font-size: 20px;
   font-weight: 700;
   color: #94a3b8;
   padding: 4px 0;
+  font-family: 'Zen Maru Gothic', sans-serif;
 }
 
 .calendar-day {
@@ -122,14 +123,15 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 15px;
-  font-weight: 500;
+  font-size: 22px;
+  font-weight: 700;
   position: relative;
   cursor: pointer;
   border-radius: 10px;
   margin: 3px;
   color: #334155;
   transition: background 0.15s;
+  font-family: 'Zen Maru Gothic', sans-serif;
 }
 .calendar-day:hover:not(.empty) {
   background-color: #f1f5f9;
@@ -140,22 +142,35 @@ body {
 
 /* 今日のアクセント */
 .calendar-day.is-today {
-  background-color: #f0fdf4;
+  background-color: #f0ea7c;
   font-weight: 700;
-  color: #16a34a;
-  border: 1px solid #bbf7d0;
+  /* color: #1147eb; */
+  border: 2px solid #e9c93e;
 }
 /* 服薬ありドットポインター */
 .calendar-day.has-med::after {
   content: "";
   position: absolute;
-  bottom: 6px;
+  bottom: 1px;
   left: 50%;
   transform: translateX(-50%);
-  width: 5px;
-  height: 5px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background-color: #10b981;
+  background-color: #eb2c0bdd;
+}
+/* ==========================================================================
+   🗓️ 曜日ヘッダーのカラーカスタマイズ（土：青 / 日：赤）
+   ========================================================================== */
+
+/* 6番目の要素（土曜日）を青系に */
+.calendar-header:nth-child(6) {
+  color: #2563eb; /* 爽やかなブルー */
+}
+
+/* 7番目の要素（日曜日）を赤系に */
+.calendar-header:nth-child(7) {
+  color: #dc2626; /* 優しいレッド */
 }
 
 /* ==========================================================================
