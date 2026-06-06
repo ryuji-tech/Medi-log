@@ -1,3 +1,12 @@
+// === Firebase 接続 ===
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+import { firebaseConfig } from "./firebase-config.js";
+
+const app = initializeApp(firebaseConfig);
+
+// 接続できたか確認（あとで消す）
+console.log("Firebase初期化:", app.name, app.options.projectId);
+
 // ==========================================================================
 // 1. データベース初期土台 ＆ localStorage 同期ロジック
 // ==========================================================================
