@@ -2,7 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
 import { firebaseConfig } from "./firebase-config.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 
 const app = initializeApp(firebaseConfig);
 
@@ -34,6 +34,7 @@ onAuthStateChanged(auth, (user) => {
     loginBtn.classList.add("hidden");
     logoutBtn.classList.remove("hidden");
     userName.textContent = user.displayName;   // ← ここがポイント
+    subscribeMedicines(user.uid);
   } else {
     console.log("未ログイン");
     loginBtn.classList.remove("hidden");
@@ -323,6 +324,44 @@ function renderCalendar(year, month) {
       });
     });
   }
+}
+
+// Firestoreの薬コレクションを見張って、配列を作り直してカレンダーを再描画する
+function subscribeMedicines(uid) {
+  const medsRef = collection(db, "profiles", uid, "medicines");
+
+  onSnapshot(medsRef, (snapshot) => {
+    // Firestoreの中身から、表示用の配列を作り直す
+    medicineMaster = [];
+    registeredMedicines = [];
+
+    snapshot.forEach((docSnap) => {
+      const d = docSnap.data();
+
+      medicineMaster.push({
+        id: docSnap.id,                 // ← Firestoreが振ったIDを使う
+        name: d.name,
+        status: d.status,
+        periodType: d.periodType,
+        targetDays: d.targetDays,
+        intervalDays: d.intervalDays,
+        frequency: d.frequency,
+        detailUsageText: d.detailUsageText,
+        dosages: d.dosages,
+        categories: d.categories,
+        tonyoRecords: []
+      });
+
+      registeredMedicines.push({
+        masterId: docSnap.id,
+        startDate: d.startDate,
+        endDate: d.endDate
+      });
+    });
+
+    console.log("Firestoreから薬を読み込み:", medicineMaster.length, "件");
+    renderCalendar(currentYear, currentMonth);
+  });
 }
 
 // ==========================================================================
