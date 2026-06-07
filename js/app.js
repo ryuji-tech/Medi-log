@@ -2,7 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
 import { firebaseConfig } from "./firebase-config.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, setDoc, deleteDoc, doc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, setDoc, updateDoc, deleteDoc, doc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 
 const app = initializeApp(firebaseConfig);
 
@@ -61,61 +61,12 @@ let currentMonth = today.getMonth() + 1;
 let activeTargetMasterIdForStop = null; // 服用終了処理中のお薬IDを一時保持
 let currentOpenedDayStr = null;         // 💡 現在アコーディオンが開いている「年-月-日」を保持するステート
 
-// --- 初期データ（localStorage が空のときに入るサンプル） ---
-const DEFAULT_MEDICINE_MASTER = [
-  {
-    id: "master_001",
-    name: "メディログ錠 10mg",
-    status: "active",
-    periodType: "daily", targetDays: [], intervalDays: 0, frequency: "2", detailUsageText: "朝・夕食後",
-    dosages: { morning: "1", noon: "0", evening: "1", bedtime: "0" },
-    categories: { morning: true, noon: false, evening: true, bedtime: false },
-    tonyoRecords: []
-  },
-  {
-    id: "master_002",
-    name: "メディログカプセル 20mg",
-    status: "active",
-    periodType: "daily", targetDays: [], intervalDays: 0, frequency: "1", detailUsageText: "朝食後",
-    dosages: { morning: "1", noon: "0", evening: "0", bedtime: "0" },
-    categories: { morning: true, noon: false, evening: false, bedtime: false },
-    tonyoRecords: []
-  }
-];
 
-const DEFAULT_REGISTERED_MEDICINES = [
-  { masterId: "master_001", startDate: "2026-05-15", endDate: "" },
-  { masterId: "master_002", startDate: "2026-05-20", endDate: "" }
-];
-
+// スナップショットが中身を入れる箱
 let medicineMaster = [];
 let registeredMedicines = [];
 let executionRecords = []; // 💡 定期薬の服薬チェック実績を保持する配列を追加
 
-// 📥 localStorage からデータをロード
-function loadDataFromStorage() {
-  const storedMaster = localStorage.getItem("med_medicineMaster");
-  const storedRegistered = localStorage.getItem("med_registeredMedicines");
-  const storedExecution = localStorage.getItem("med_executionRecords"); // 💡 追加
-
-  if (storedMaster && storedRegistered) {
-    medicineMaster = JSON.parse(storedMaster);
-    registeredMedicines = JSON.parse(storedRegistered);
-    executionRecords = storedExecution ? JSON.parse(storedExecution) : []; // 💡 追加
-  } else {
-    medicineMaster = DEFAULT_MEDICINE_MASTER;
-    registeredMedicines = DEFAULT_REGISTERED_MEDICINES;
-    executionRecords = []; // 💡 追加
-    saveDataToStorage();
-  }
-}
-
-// 💾 localStorage に現在のステートを保存
-function saveDataToStorage() {
-  localStorage.setItem("med_medicineMaster", JSON.stringify(medicineMaster));
-  localStorage.setItem("med_registeredMedicines", JSON.stringify(registeredMedicines));
-  localStorage.setItem("med_executionRecords", JSON.stringify(executionRecords)); // 💡 追加
-}
 
 // ==========================================================================
 // 2. 厳密な服薬スケジュール判定エンジン
@@ -452,13 +403,14 @@ function renderMasterListSheet() {
     });
   });
 
-  document.querySelectorAll(".delete-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
+document.querySelectorAll(".delete-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
       const id = btn.dataset.id;
       const target = medicineMaster.find(m => m.id === id);
-      if (target && confirm(`「${target.name}」をシステムから完全に削除しますか？\n（過去のカレンダーからも履歴が消えます）`)) {
-        target.status = "deleted";
-        saveDataToStorage(); // 💾 状態変更を即時保存
+      const user = auth.currentUser;
+      if (target && user && confirm(`「${target.name}」をシステムから完全に削除しますか？\n（過去のカレンダーからも履歴が消えます）`)) {
+        target.status = "deleted"; // 画面を即反映するための楽観的更新
+        await updateDoc(doc(db, "profiles", user.uid, "medicines", id), { status: "deleted" });
         renderMasterListSheet();
         renderCalendar(currentYear, currentMonth);
       }
@@ -553,9 +505,6 @@ document.getElementById("submit-register-btn").addEventListener("click", async (
     registeredMedicines.push({ masterId: targetMasterId, startDate, endDate });
   }
 
-  // 💾 ③ 【重要】すべての配列データへのプッシュが完了した「この瞬間」に保存！
-  saveDataToStorage(); 
-
     // Firestoreにも保存（ログイン中ユーザーの入れ物へ）
   const user = auth.currentUser;
   if (user) {
@@ -600,16 +549,17 @@ document.getElementById("next-month-btn").addEventListener("click", () => {
   renderCalendar(currentYear, currentMonth);
 });
 
-document.getElementById("confirm-stop-btn").addEventListener("click", () => {
+document.getElementById("confirm-stop-btn").addEventListener("click", async () => {
   const chosenDate = document.getElementById("stop-med-date-input").value;
   if (!chosenDate) { alert("終了日を指定してください。"); return; }
 
   const reg = registeredMedicines.find(r => r.masterId === activeTargetMasterIdForStop);
   const med = medicineMaster.find(m => m.id === activeTargetMasterIdForStop);
+  const user = auth.currentUser;
 
-  if (reg && med) {
-    reg.endDate = chosenDate; 
-    saveDataToStorage(); // 💾 保存
+  if (reg && med && user) {
+    reg.endDate = chosenDate; // 楽観的更新
+    await updateDoc(doc(db, "profiles", user.uid, "medicines", med.id), { endDate: chosenDate });
     alert(`「${med.name}」の終了日を ${chosenDate} に保存しました。`);
     document.getElementById("stop-date-modal").classList.add("hidden");
     renderMasterListSheet();
@@ -661,26 +611,5 @@ frequencySelect.addEventListener("change", (e) => {
 });
 
 // アプリ起動時のデータロード ➔ 描画トリガー
-loadDataFromStorage();
+// 起動直後は空のカレンダー → ログイン後にスナップショットが中身を描く
 renderCalendar(currentYear, currentMonth);
-
-
-// ==========================================================================
-// 7. 検証者のための localStorage 完全クリーンアップ（ガイダンス付き一括削除）
-// ==========================================================================
-document.getElementById("floating-clear-btn").addEventListener("click", () => {
-  const guidanceMessage = 
-    "デモページを触ってくれてありがとうございます。\n" +
-    "OKを押下すると端末内の登録データを安全に削除することができます。\n" +
-    "必要に応じて検証終了時に登録データの削除を行ってください。\n\n" +
-    "このブラウザに保存されているアプリのデータをすべて消去し、初期状態に戻しますか？";
-
-  if (confirm(guidanceMessage)) {
-    localStorage.removeItem("med_medicineMaster");
-    localStorage.removeItem("med_registeredMedicines");
-    localStorage.removeItem("med_executionRecords"); // 💡 追加
-    
-    alert("データを安全に消去しました。初期状態に戻ります。");
-    window.location.reload();
-  }
-});
