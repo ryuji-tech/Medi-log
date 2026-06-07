@@ -1,8 +1,39 @@
 // === Firebase 接続 ===
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
 import { firebaseConfig } from "./firebase-config.js";
-
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
 const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+// ログインボタンを押したら、Googleのログイン画面をポップアップで出す
+document.getElementById("login-btn").addEventListener("click", () => {
+  signInWithPopup(auth, provider);
+});
+
+document.getElementById("logout-btn").addEventListener("click", () => {
+  signOut(auth);
+});
+
+// ログイン状態を見張る（onSnapshotと同じ「見張り」パターン）
+onAuthStateChanged(auth, (user) => {
+  const loginBtn = document.getElementById("login-btn");
+  const logoutBtn = document.getElementById("logout-btn");
+  const userName = document.getElementById("user-name");
+
+  if (user) {
+    console.log("ログイン中:", user.displayName, user.uid);
+    loginBtn.classList.add("hidden");
+    logoutBtn.classList.remove("hidden");
+    userName.textContent = user.displayName;   // ← ここがポイント
+  } else {
+    console.log("未ログイン");
+    loginBtn.classList.remove("hidden");
+    logoutBtn.classList.add("hidden");
+    userName.textContent = "";
+  }
+});
 
 // 接続できたか確認（あとで消す）
 console.log("Firebase初期化:", app.name, app.options.projectId);
