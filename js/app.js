@@ -2,7 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
 import { firebaseConfig } from "./firebase-config.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, setDoc, deleteDoc, doc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 
 const app = initializeApp(firebaseConfig);
 
@@ -31,6 +31,7 @@ onAuthStateChanged(auth, (user) => {
 
   if (user) {
     console.log("ログイン中:", user.displayName, user.uid);
+    subscribeExecutions(user.uid);
     loginBtn.classList.add("hidden");
     logoutBtn.classList.remove("hidden");
     userName.textContent = user.displayName;   // ← ここがポイント
@@ -302,19 +303,29 @@ function renderCalendar(year, month) {
 
         // 💡 3. 生成したチェックボックスの変更（クリック）イベントを監視するロジックを追加
         panel.querySelectorAll(".med-checkbox:not([disabled])").forEach(cb => {
-          cb.addEventListener("change", (e) => {
+            cb.addEventListener("change", async (e) => {
             const mId = e.target.dataset.masterId;
             const catId = e.target.dataset.category;
+            const user = auth.currentUser;
+            if (!user) return;
+
+            // このチェック1つを一意に表すドキュメントID
+            const execId = `${clickedDayStr}_${mId}_${catId}`;
+            const execRef = doc(db, "profiles", user.uid, "executions", execId);
 
             if (e.target.checked) {
-              // チェックされたら実績配列に追加
               executionRecords.push({ date: clickedDayStr, masterId: mId, category: catId });
+              await setDoc(execRef, {
+                date: clickedDayStr,
+                masterId: mId,
+                category: catId,
+                takenAt: serverTimestamp()
+              });
             } else {
-              // チェックが外されたら実績配列から削除
               executionRecords = executionRecords.filter(r => !(r.date === clickedDayStr && r.masterId === mId && r.category === catId));
+              await deleteDoc(execRef);
             }
-            saveDataToStorage(); // 💾 ローカルストレージに保存
-          });
+        });
         });
         
         // 💡 新しく開く必要があるときだけ遅延させてクラスを付与（なめらかさ担保）
@@ -361,6 +372,20 @@ function subscribeMedicines(uid) {
 
     console.log("Firestoreから薬を読み込み:", medicineMaster.length, "件");
     renderCalendar(currentYear, currentMonth);
+  });
+}
+
+// 服薬チェック実績を見張って、配列を作り直す
+function subscribeExecutions(uid) {
+  const execRef = collection(db, "profiles", uid, "executions");
+
+  onSnapshot(execRef, (snapshot) => {
+    executionRecords = [];
+    snapshot.forEach((docSnap) => {
+      const d = docSnap.data();
+      executionRecords.push({ date: d.date, masterId: d.masterId, category: d.category });
+    });
+    console.log("Firestoreから服薬実績を読み込み:", executionRecords.length, "件");
   });
 }
 
