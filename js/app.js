@@ -36,6 +36,7 @@ onAuthStateChanged(auth, (user) => {
     logoutBtn.classList.remove("hidden");
     userName.textContent = user.displayName;   // ← ここがポイント
     subscribeMedicines(user.uid);
+    subscribeTonyo(user.uid);
   } else {
     console.log("未ログイン");
     loginBtn.classList.remove("hidden");
@@ -66,6 +67,7 @@ let currentOpenedDayStr = null;         // 💡 現在アコーディオンが�
 let medicineMaster = [];
 let registeredMedicines = [];
 let executionRecords = []; // 💡 定期薬の服薬チェック実績を保持する配列を追加
+let tonyoLog = []; // 頓用の服用記録（Firestoreから読み込む）
 
 
 // ==========================================================================
@@ -106,14 +108,13 @@ function getMedicinesForDay(year, month, day) {
     }
   });
 
-  medicineMaster.forEach(med => {
-    if (med.status !== "active" || !med.tonyoRecords) return;
-    med.tonyoRecords.forEach(rec => {
-      const recDate = new Date(rec.date);
-      if (recDate.getFullYear() === year && (recDate.getMonth() + 1) === month && recDate.getDate() === day) {
-        todaysMeds.push({ info: med, type: "tonyo_log", timeLog: rec.time });
-      }
-    });
+tonyoLog.forEach(rec => {
+    const med = medicineMaster.find(m => m.id === rec.masterId && m.status === "active");
+    if (!med) return;
+    const recDate = new Date(rec.date);
+    if (recDate.getFullYear() === year && (recDate.getMonth() + 1) === month && recDate.getDate() === day) {
+      todaysMeds.push({ info: med, type: "tonyo_log", timeLog: rec.time });
+    }
   });
 
   return todaysMeds;
@@ -340,6 +341,20 @@ function subscribeExecutions(uid) {
   });
 }
 
+function subscribeTonyo(uid) {
+  const tonyoRef = collection(db, "profiles", uid, "tonyoRecords");
+
+  onSnapshot(tonyoRef, (snapshot) => {
+    tonyoLog = [];
+    snapshot.forEach((docSnap) => {
+      const d = docSnap.data();
+      tonyoLog.push({ masterId: d.masterId, date: d.date, time: d.time });
+    });
+    console.log("Firestoreから頓用記録を読み込み:", tonyoLog.length, "件");
+    renderCalendar(currentYear, currentMonth);
+  });
+}
+
 // ==========================================================================
 // 4. マスタ履歴一覧の動的描画
 // ==========================================================================
@@ -473,7 +488,6 @@ document.getElementById("submit-register-btn").addEventListener("click", async (
 
   if (!name || !startDate || !frequency) { alert("必須項目に入力漏れがあります。"); return; }
 
-  let targetMasterId = "master_" + Date.now();
   let periodType = document.querySelector('input[name="med-period-type"]:checked').value;
   let targetDays = []; let intervalDays = 0;
   if (frequency === "tonyo") periodType = "daily";
@@ -491,39 +505,38 @@ document.getElementById("submit-register-btn").addEventListener("click", async (
   else if (frequency === "2") { categories.morning = true; categories.evening = true; dosages.morning = uniformAmount; dosages.evening = uniformAmount; }
   else if (frequency === "1") { categories.morning = true; dosages.morning = uniformAmount; }
 
-  // ① マスタ配列へ登録情報を格納
-  medicineMaster.push({
-    id: targetMasterId, name, status: "active", periodType, targetDays, intervalDays, frequency, detailUsageText, dosages, categories, tonyoRecords: []
+  // Firestoreに薬を登録
+  const user = auth.currentUser;
+  if (!user) { alert("ログインしてください。"); return; }
+
+  const medRef = await addDoc(collection(db, "profiles", user.uid, "medicines"), {
+    name,
+    status: "active",
+    periodType,
+    targetDays,
+    intervalDays,
+    frequency,
+    detailUsageText,
+    dosages,
+    categories,
+    startDate,
+    endDate,
+    createdAt: serverTimestamp()
   });
 
-  // ② 各服用モードに応じた連動データの追加処理
+  // 頓用なら、服用した記録を1件保存
   if (frequency === "tonyo") {
-    const targetMed = medicineMaster.find(m => m.id === targetMasterId);
-    const hr = document.getElementById("tonyo-actual-hour").value; const min = document.getElementById("tonyo-actual-minute").value;
-    targetMed.tonyoRecords.push({ date: startDate, time: `${hr}:${min}` });
-  } else {
-    registeredMedicines.push({ masterId: targetMasterId, startDate, endDate });
-  }
-
-    // Firestoreにも保存（ログイン中ユーザーの入れ物へ）
-  const user = auth.currentUser;
-  if (user) {
-    await addDoc(collection(db, "profiles", user.uid, "medicines"), {
-      name,
-      status: "active",
-      periodType,
-      targetDays,
-      intervalDays,
-      frequency,
-      detailUsageText,
-      dosages,
-      categories,
-      startDate,
-      endDate,
+    const hr = document.getElementById("tonyo-actual-hour").value;
+    const min = document.getElementById("tonyo-actual-minute").value;
+    await addDoc(collection(db, "profiles", user.uid, "tonyoRecords"), {
+      masterId: medRef.id,
+      date: startDate,
+      time: `${hr}:${min}`,
       createdAt: serverTimestamp()
     });
-    console.log("Firestoreに薬を保存しました:", name);
   }
+
+  console.log("Firestoreに薬を保存しました:", name);
 
   alert(`「${name}」を新しく登録しました。`);
   bottomSheet.classList.remove("is-open"); sheetOverlay.classList.remove("is-active");
