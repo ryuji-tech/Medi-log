@@ -2,10 +2,16 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
 import { firebaseConfig } from "./firebase-config.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+
 const app = initializeApp(firebaseConfig);
 
 const auth = getAuth(app);
+const db = getFirestore(app);
+
+
 const provider = new GoogleAuthProvider();
+
 
 // ログインボタンを押したら、Googleのログイン画面をポップアップで出す
 document.getElementById("login-btn").addEventListener("click", () => {
@@ -15,6 +21,7 @@ document.getElementById("login-btn").addEventListener("click", () => {
 document.getElementById("logout-btn").addEventListener("click", () => {
   signOut(auth);
 });
+
 
 // ログイン状態を見張る（onSnapshotと同じ「見張り」パターン）
 onAuthStateChanged(auth, (user) => {
@@ -442,7 +449,7 @@ document.getElementById("quote-medicine-select").addEventListener("change", (e) 
 });
 
 // 💡 【整流】登録実行処理（配列へのすべてのデータプッシュ完了後に正しく保存を実行）
-document.getElementById("submit-register-btn").addEventListener("click", () => {
+document.getElementById("submit-register-btn").addEventListener("click", async () => {
   const name = document.getElementById("med-name").value.trim();
   const startDate = document.getElementById("med-start-date").value;
   const endDate = document.getElementById("med-end-date").value;
@@ -484,6 +491,26 @@ document.getElementById("submit-register-btn").addEventListener("click", () => {
 
   // 💾 ③ 【重要】すべての配列データへのプッシュが完了した「この瞬間」に保存！
   saveDataToStorage(); 
+
+    // Firestoreにも保存（ログイン中ユーザーの入れ物へ）
+  const user = auth.currentUser;
+  if (user) {
+    await addDoc(collection(db, "profiles", user.uid, "medicines"), {
+      name,
+      status: "active",
+      periodType,
+      targetDays,
+      intervalDays,
+      frequency,
+      detailUsageText,
+      dosages,
+      categories,
+      startDate,
+      endDate,
+      createdAt: serverTimestamp()
+    });
+    console.log("Firestoreに薬を保存しました:", name);
+  }
 
   alert(`「${name}」を新しく登録しました。`);
   bottomSheet.classList.remove("is-open"); sheetOverlay.classList.remove("is-active");
