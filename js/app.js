@@ -2,7 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
 import { firebaseConfig } from "./firebase-config.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, setDoc, updateDoc, deleteDoc, doc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, setDoc, updateDoc, deleteDoc, doc, getDoc, arrayUnion, query, where, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 
 const app = initializeApp(firebaseConfig);
 
@@ -22,21 +22,72 @@ document.getElementById("logout-btn").addEventListener("click", () => {
   signOut(auth);
 });
 
+document.getElementById("join-btn").addEventListener("click", async () => {
+  const code = document.getElementById("join-code-input").value.trim();
+  const user = auth.currentUser;
+
+  if (!user) { alert("ログインしてください。"); return; }
+  if (!code) { alert("共有コードを入力してください。"); return; }
+  if (code === user.uid) { alert("自分のコードには参加できません。"); return; }
+
+  // 相手のプロフィールの下に「参加申請」を作る
+  await setDoc(doc(db, "profiles", code, "joinRequests", user.uid), {
+    requesterUid: user.uid,
+    requesterName: user.displayName,
+    createdAt: serverTimestamp()
+  });
+
+  alert("参加申請を送りました。相手の承認をお待ちください。");
+  document.getElementById("join-code-input").value = "";
+});
+
+document.getElementById("profile-select").addEventListener("change", (e) => {
+  activeProfileId = e.target.value;
+  subscribeMedicines(activeProfileId);
+  subscribeExecutions(activeProfileId);
+  subscribeTonyo(activeProfileId);
+  renderCalendar(currentYear, currentMonth);
+});
+
+let activeProfileId = null; //現在表示、操作をしているプロフィールのID
+let unsubMedicines = null;
+let unsubExecutions = null;
+let unsubTonyo = null;
+
 
 // ログイン状態を見張る（onSnapshotと同じ「見張り」パターン）
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
   const loginBtn = document.getElementById("login-btn");
   const logoutBtn = document.getElementById("logout-btn");
   const userName = document.getElementById("user-name");
 
   if (user) {
     console.log("ログイン中:", user.displayName, user.uid);
-    subscribeExecutions(user.uid);
     loginBtn.classList.add("hidden");
     logoutBtn.classList.remove("hidden");
-    userName.textContent = user.displayName;   // ← ここがポイント
-    subscribeMedicines(user.uid);
-    subscribeTonyo(user.uid);
+    userName.textContent = user.displayName;
+    document.getElementById("my-share-code").textContent = user.uid;
+    subscribeJoinRequests(user.uid);
+    subscribeAccessibleProfiles(user.uid);
+
+    // いまは自分のプロフィールをアクティブにする
+    activeProfileId = user.uid;
+
+    // プロフィール文書が無ければ作る（members に自分を入れる）
+    const profRef = doc(db, "profiles", user.uid);
+    const profSnap = await getDoc(profRef);
+    if (!profSnap.exists()) {
+      await setDoc(profRef, {
+        ownerUid: user.uid,
+        members: [user.uid],
+        createdAt: serverTimestamp()
+      });
+    }
+
+    // アクティブプロフィールのデータを購読
+    subscribeMedicines(activeProfileId);
+    subscribeExecutions(activeProfileId);
+    subscribeTonyo(activeProfileId);
   } else {
     console.log("未ログイン");
     loginBtn.classList.remove("hidden");
@@ -263,7 +314,7 @@ function renderCalendar(year, month) {
 
             // このチェック1つを一意に表すドキュメントID
             const execId = `${clickedDayStr}_${mId}_${catId}`;
-            const execRef = doc(db, "profiles", user.uid, "executions", execId);
+            const execRef = doc(db, "profiles", activeProfileId, "executions", execId);
 
             if (e.target.checked) {
               executionRecords.push({ date: clickedDayStr, masterId: mId, category: catId });
@@ -291,9 +342,10 @@ function renderCalendar(year, month) {
 
 // Firestoreの薬コレクションを見張って、配列を作り直してカレンダーを再描画する
 function subscribeMedicines(uid) {
+  if (unsubMedicines) unsubMedicines();
   const medsRef = collection(db, "profiles", uid, "medicines");
 
-  onSnapshot(medsRef, (snapshot) => {
+  unsubMedicines = onSnapshot(medsRef, (snapshot) => {
     // Firestoreの中身から、表示用の配列を作り直す
     medicineMaster = [];
     registeredMedicines = [];
@@ -327,11 +379,46 @@ function subscribeMedicines(uid) {
   });
 }
 
+// 自分のプロフィール宛の参加申請を見張って、一覧表示する
+function subscribeJoinRequests(uid) {
+  const reqRef = collection(db, "profiles", uid, "joinRequests");
+
+  onSnapshot(reqRef, (snapshot) => {
+    const container = document.getElementById("pending-requests");
+    container.textContent = ""; // 一旦空にする
+
+    snapshot.forEach((docSnap) => {
+      const d = docSnap.data();
+
+      const row = document.createElement("div");
+
+      const label = document.createElement("span");
+      label.textContent = `${d.requesterName} さんが参加申請中　`; // ← textContentで安全に
+
+      const approveBtn = document.createElement("button");
+      approveBtn.textContent = "承認";
+      approveBtn.addEventListener("click", async () => {
+        // members に申請者を追加
+        await updateDoc(doc(db, "profiles", uid), {
+          members: arrayUnion(d.requesterUid)
+        });
+        // 申請文書は役目を終えたので削除
+        await deleteDoc(doc(db, "profiles", uid, "joinRequests", docSnap.id));
+      });
+
+      row.appendChild(label);
+      row.appendChild(approveBtn);
+      container.appendChild(row);
+    });
+  });
+}
+
 // 服薬チェック実績を見張って、配列を作り直す
 function subscribeExecutions(uid) {
+  if (unsubExecutions) unsubExecutions();
   const execRef = collection(db, "profiles", uid, "executions");
 
-  onSnapshot(execRef, (snapshot) => {
+  unsubExecutions = onSnapshot(execRef, (snapshot) => {
     executionRecords = [];
     snapshot.forEach((docSnap) => {
       const d = docSnap.data();
@@ -342,9 +429,10 @@ function subscribeExecutions(uid) {
 }
 
 function subscribeTonyo(uid) {
+  if (unsubTonyo) unsubTonyo();
   const tonyoRef = collection(db, "profiles", uid, "tonyoRecords");
 
-  onSnapshot(tonyoRef, (snapshot) => {
+  unsubTonyo = onSnapshot(tonyoRef, (snapshot) => {
     tonyoLog = [];
     snapshot.forEach((docSnap) => {
       const d = docSnap.data();
@@ -352,6 +440,25 @@ function subscribeTonyo(uid) {
     });
     console.log("Firestoreから頓用記録を読み込み:", tonyoLog.length, "件");
     renderCalendar(currentYear, currentMonth);
+  });
+}
+
+// 自分がメンバーに入っているプロフィールを見張り、ドロップダウンに反映
+function subscribeAccessibleProfiles(uid) {
+  const q = query(collection(db, "profiles"), where("members", "array-contains", uid));
+
+  onSnapshot(q, (snapshot) => {
+    const select = document.getElementById("profile-select");
+    select.innerHTML = "";
+
+    snapshot.forEach((docSnap) => {
+      const option = document.createElement("option");
+      option.value = docSnap.id;
+      option.textContent = (docSnap.id === uid) ? "自分のプロフィール" : `共有: ${docSnap.id.slice(0, 6)}…`;
+      select.appendChild(option);
+    });
+
+    select.value = activeProfileId; // いま見ているものを選択状態に保つ
   });
 }
 
@@ -425,7 +532,7 @@ document.querySelectorAll(".delete-btn").forEach(btn => {
       const user = auth.currentUser;
       if (target && user && confirm(`「${target.name}」をシステムから完全に削除しますか？\n（過去のカレンダーからも履歴が消えます）`)) {
         target.status = "deleted"; // 画面を即反映するための楽観的更新
-        await updateDoc(doc(db, "profiles", user.uid, "medicines", id), { status: "deleted" });
+        await updateDoc(doc(db, "profiles", activeProfileId, "medicines", id), { status: "deleted" });
         renderMasterListSheet();
         renderCalendar(currentYear, currentMonth);
       }
@@ -509,7 +616,7 @@ document.getElementById("submit-register-btn").addEventListener("click", async (
   const user = auth.currentUser;
   if (!user) { alert("ログインしてください。"); return; }
 
-  const medRef = await addDoc(collection(db, "profiles", user.uid, "medicines"), {
+  const medRef = await addDoc(collection(db, "profiles", activeProfileId, "medicines"), {
     name,
     status: "active",
     periodType,
@@ -528,7 +635,7 @@ document.getElementById("submit-register-btn").addEventListener("click", async (
   if (frequency === "tonyo") {
     const hr = document.getElementById("tonyo-actual-hour").value;
     const min = document.getElementById("tonyo-actual-minute").value;
-    await addDoc(collection(db, "profiles", user.uid, "tonyoRecords"), {
+    await addDoc(collection(db, "profiles", activeProfileId, "tonyoRecords"), {
       masterId: medRef.id,
       date: startDate,
       time: `${hr}:${min}`,
@@ -572,7 +679,7 @@ document.getElementById("confirm-stop-btn").addEventListener("click", async () =
 
   if (reg && med && user) {
     reg.endDate = chosenDate; // 楽観的更新
-    await updateDoc(doc(db, "profiles", user.uid, "medicines", med.id), { endDate: chosenDate });
+    await updateDoc(doc(db, "profiles", activeProfileId, "medicines", med.id), { endDate: chosenDate });
     alert(`「${med.name}」の終了日を ${chosenDate} に保存しました。`);
     document.getElementById("stop-date-modal").classList.add("hidden");
     renderMasterListSheet();
