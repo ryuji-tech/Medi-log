@@ -79,10 +79,14 @@ onAuthStateChanged(auth, async (user) => {
     if (!profSnap.exists()) {
       await setDoc(profRef, {
         ownerUid: user.uid,
+        ownerName: user.displayName, //プロフィールをIDじゃなくて名前で表示できるように。
         members: [user.uid],
         createdAt: serverTimestamp()
       });
+    } else {
+      await updateDoc(profRef, { ownerName: user.displayName }); // 名前は毎回最新に
     }
+  
 
     // アクティブプロフィールのデータを購読
     subscribeMedicines(activeProfileId);
@@ -451,14 +455,22 @@ function subscribeAccessibleProfiles(uid) {
     const select = document.getElementById("profile-select");
     select.innerHTML = "";
 
-    snapshot.forEach((docSnap) => {
+    // 自分のプロフィールを必ず先頭に並べる
+    const docs = snapshot.docs.slice().sort((a, b) => {
+      if (a.id === uid) return -1;
+      if (b.id === uid) return 1;
+      return 0;
+    });
+
+    docs.forEach((docSnap) => {
+      const d = docSnap.data();
       const option = document.createElement("option");
       option.value = docSnap.id;
-      option.textContent = (docSnap.id === uid) ? "自分のプロフィール" : `共有: ${docSnap.id.slice(0, 6)}…`;
+      option.textContent = (docSnap.id === uid) ? `自分（${d.ownerName ?? "名前未設定"}）` : `${d.ownerName ?? "名前未設定"} さん`;
       select.appendChild(option);
     });
 
-    select.value = activeProfileId; // いま見ているものを選択状態に保つ
+    select.value = activeProfileId;
   });
 }
 
