@@ -1,0 +1,49 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ログイン中の人が、そのプロフィールのメンバーか？
+    function isMember(profileId) {
+      return request.auth != null
+        && request.auth.uid in get(/databases/$(database)/documents/profiles/$(profileId)).data.members;
+    }
+
+    // ログイン中の人が、そのプロフィールの持ち主か？
+    function isOwner(profileId) {
+      return request.auth != null
+        && request.auth.uid == get(/databases/$(database)/documents/profiles/$(profileId)).data.ownerUid;
+    }
+
+    match /profiles/{profileId} {
+      // 読み取り: membersに入っている人だけ（新規作成前の存在確認も許可）
+      allow read: if request.auth != null
+        && (resource == null || request.auth.uid in resource.data.members);
+
+      // 作成: 自分のuidをIDにした、自分が持ち主のプロフィールだけ
+      allow create: if request.auth != null
+        && request.auth.uid == profileId
+        && request.resource.data.ownerUid == request.auth.uid;
+
+      // 更新: 持ち主だけ（名前更新・承認によるmembers追加）
+      allow update: if isOwner(profileId);
+
+      // 薬・服薬実績・頓用: メンバーなら読み書きOK
+      match /medicines/{medId} {
+        allow read, write: if isMember(profileId);
+      }
+      match /executions/{execId} {
+        allow read, write: if isMember(profileId);
+      }
+      match /tonyoRecords/{recId} {
+        allow read, write: if isMember(profileId);
+      }
+
+      // 参加申請: 自分の申請は誰でも作れる。閲覧・削除は持ち主だけ
+      match /joinRequests/{reqId} {
+        allow create: if request.auth != null && request.auth.uid == reqId;
+        allow read, delete: if isOwner(profileId);
+      }
+    }
+  }
+}
