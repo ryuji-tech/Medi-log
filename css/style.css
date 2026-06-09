@@ -618,6 +618,7 @@ body {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
+  min-height: 40px;
 }
 
 .duration-inputs > div,
