@@ -15,7 +15,7 @@ const provider = new GoogleAuthProvider();
 
 // ログインボタンを押したら、Googleのログイン画面をポップアップで出す
 document.getElementById("login-btn").addEventListener("click", () => {
-  signInWithRedirect(auth, provider);
+  signInWithPopup(auth, provider);
 });
 
 document.getElementById("logout-btn").addEventListener("click", () => {
