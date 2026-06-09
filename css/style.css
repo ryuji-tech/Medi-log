@@ -20,6 +20,8 @@ body {
     linear-gradient(rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.6)),
     url("../images/background-water.avif") no-repeat center center fixed;
   background-size: cover;
+
+  overflow-x: hidden; /* 横のはみ出し対策 */
 }
 
 
@@ -613,12 +615,14 @@ body {
 .duration-inputs {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  /* minmax(0, 1fr) は「最小0までOK、最大は均等」の意味 */
   gap: 10px;
-  .duration-inputs > div {
+}
+.duration-inputs > div,
+.duration-inputs input {
   min-width: 0;
 }
 
-}
 .sub-label {
   font-size: 11px;
   color: #64748b;
