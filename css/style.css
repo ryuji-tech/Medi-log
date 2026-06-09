@@ -417,6 +417,7 @@ body {
   flex: 1;
   overflow-y: auto;
   padding: 20px;
+  overflow-x: hidden;
 }
 .list-section-title {
   font-size: 12px;
