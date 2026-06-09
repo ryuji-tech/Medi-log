@@ -41,6 +41,17 @@ document.getElementById("join-btn").addEventListener("click", async () => {
   document.getElementById("join-code-input").value = "";
 });
 
+document.getElementById("save-display-name-btn").addEventListener("click", async () => {
+  const user = auth.currentUser;
+  if (!user) { alert("ログインしてください。"); return; }
+
+  const name = document.getElementById("display-name-input").value.trim();
+  if (!name) { alert("表示名を入力してください。"); return; }
+
+  await updateDoc(doc(db, "profiles", user.uid), { profileName: name });
+  alert("表示名を保存しました。");
+});
+
 document.getElementById("profile-select").addEventListener("change", (e) => {
   activeProfileId = e.target.value;
   subscribeMedicines(activeProfileId);
@@ -87,6 +98,8 @@ onAuthStateChanged(auth, async (user) => {
     } else {
       await updateDoc(profRef, { ownerName: user.displayName }); // 名前は毎回最新に
     }
+
+    document.getElementById("display-name-input").value = profSnap.exists() ? (profSnap.data().profileName ?? "") : "";
   
 
     // アクティブプロフィールのデータを購読
@@ -468,6 +481,8 @@ function subscribeAccessibleProfiles(uid) {
       const d = docSnap.data();
       const option = document.createElement("option");
       option.value = docSnap.id;
+      const shownName = d.profileName ?? d.ownerName ?? "名前未設定";
+      option.textContent = (docSnap.id === uid) ? `自分（${shownName}）` : `${shownName} さん`;
       option.textContent = (docSnap.id === uid) ? `自分（${d.ownerName ?? "名前未設定"}）` : `${d.ownerName ?? "名前未設定"} さん`;
       select.appendChild(option);
     });
