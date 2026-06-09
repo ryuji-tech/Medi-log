@@ -614,8 +614,7 @@ body {
 }
 .duration-inputs {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  /* minmax(0, 1fr) は「最小0までOK、最大は均等」の意味 */
+  grid-template-columns: 1fr;
   gap: 10px;
 }
 .duration-inputs > div,
