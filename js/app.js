@@ -65,6 +65,7 @@ onAuthStateChanged(auth, async (user) => {
     console.log("ログイン中:", user.displayName, user.uid);
     loginBtn.classList.add("hidden");
     logoutBtn.classList.remove("hidden");
+    document.getElementById("share-area").classList.remove("hidden");
     userName.textContent = user.displayName;
     document.getElementById("my-share-code").textContent = user.uid;
     subscribeJoinRequests(user.uid);
@@ -96,6 +97,7 @@ onAuthStateChanged(auth, async (user) => {
     console.log("未ログイン");
     loginBtn.classList.remove("hidden");
     logoutBtn.classList.add("hidden");
+    document.getElementById("share-area").classList.add("hidden");
     userName.textContent = "";
   }
 });
