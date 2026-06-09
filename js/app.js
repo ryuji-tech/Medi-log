@@ -1,7 +1,7 @@
 // === Firebase 接続 ===
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
 import { firebaseConfig } from "./firebase-config.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithRedirect, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, setDoc, updateDoc, deleteDoc, doc, getDoc, arrayUnion, query, where, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 
 const app = initializeApp(firebaseConfig);
@@ -15,7 +15,7 @@ const provider = new GoogleAuthProvider();
 
 // ログインボタンを押したら、Googleのログイン画面をポップアップで出す
 document.getElementById("login-btn").addEventListener("click", () => {
-  signInWithPopup(auth, provider);
+  signInWithRedirect(auth, provider);
 });
 
 document.getElementById("logout-btn").addEventListener("click", () => {
