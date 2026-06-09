@@ -483,8 +483,7 @@ function subscribeAccessibleProfiles(uid) {
       option.value = docSnap.id;
       const shownName = d.profileName ?? d.ownerName ?? "名前未設定";
       option.textContent = (docSnap.id === uid) ? `自分（${shownName}）` : `${shownName} さん`;
-      option.textContent = (docSnap.id === uid) ? `自分（${d.ownerName ?? "名前未設定"}）` : `${d.ownerName ?? "名前未設定"} さん`;
-      select.appendChild(option);
+      select.appendChild(option); 
     });
 
     select.value = activeProfileId;
