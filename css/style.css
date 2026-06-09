@@ -613,11 +613,13 @@ body {
   border-radius: 10px;
   border: 1px solid #e2e8f0;
 }
-.duration-inputs {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px;
+
+.duration-inputs input {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
 }
+
 .duration-inputs > div,
 .duration-inputs input {
   min-width: 0;
