@@ -284,14 +284,14 @@ function renderCalendar(year, month) {
 
         // 💡 2. カルテのHTML中身の生成（開いたままで中身だけが瞬時に切り替わる）
         const todaysMeds = getMedicinesForDay(year, month, day);
-        let html = `<h3 class="accordion-title">💊 ${month}月${day}日（${dayOfWeek}）の服薬予定</h3>`;
+        let html = `<h3 class="accordion-title"><span class="icon icon-inline icon-capsule"></span>${month}月${day}日（${dayOfWeek}）の服薬予定</h3>`;
 
         if (todaysMeds.length === 0) {
           html += `<p class="no-medicine-msg">🌟 この日に服用するお薬の予定はありません。</p>`;
         } else {
           const cats = [
-            { id: "morning", label: "🌅 朝のむお薬" }, { id: "noon", label: "☀️ 昼のむお薬" },
-            { id: "evening", label: "🌌 夕のむお薬" }, { id: "bedtime", label: "🌙 眠前にのむお薬" }
+            { id: "morning", label: "朝のお薬" }, { id: "noon", label: "昼のお薬" },
+            { id: "evening", label: "夕のお薬" }, { id: "bedtime", label: "寝る前のお薬" }
           ];
           cats.forEach(cat => {
             const matched = todaysMeds.filter(m => m.type === "schedule" && m.info.categories[cat.id]);
@@ -531,12 +531,12 @@ function renderMasterListSheet() {
       activeCount++;
       card.innerHTML = `
         <div class="med-master-card-header">
-          <span class="med-master-card-title">💊 ${m.name}</span>
+          <span class="med-master-card-title"><span class="icon icon-inline icon-capsule"></span>${m.name}</span>
           <span class="med-master-card-meta">${m.frequency === "tonyo" ? "頓用" : m.detailUsageText}</span>
         </div>
-        <div style="font-size:11px; color:var(--accent); margin-top:4px;">📅 連動服用中 (開始: ${reg?reg.startDate:'--'})</div>
+        <div style="font-size:11px; color:var(--accent); margin-top:4px;"><span class="icon icon-inline icon-calendar"></span>連動服用中 (開始: ${reg?reg.startDate:'--'})</div>
         <div class="med-master-action-row">
-          <button class="btn-action-small stop-trigger-btn" data-id="${m.id}">🛑 服用終了処理</button>
+          <button class="btn-action-small stop-trigger-btn" data-id="${m.id}"><span class="icon icon-inline icon-success"></span>服用終了処理</button>
           <button class="btn-action-small delete-btn" data-id="${m.id}">🗑️ 削除</button>
         </div>`;
       activeContainer.appendChild(card);

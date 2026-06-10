@@ -213,6 +213,37 @@ body {
   box-shadow: 4px 4px 9px var(--sd), -4px -4px 9px var(--sl);
 }
 
+.icon {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  flex: none;
+  background-color: currentColor;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+.chip .icon { width: 16px; height: 16px; }
+.dock-btn .icon { width: 24px; height: 24px; }
+.primary-dock .icon { width: 26px; height: 26px; }
+.btn-action-small .icon { width: 15px; height: 15px; vertical-align: -2px; margin-right: 4px; }
+
+.icon-logout { -webkit-mask-image: url("../images/icons/logout.svg"); mask-image: url("../images/icons/logout.svg"); }
+.icon-share  { -webkit-mask-image: url("../images/icons/user-group.svg"); mask-image: url("../images/icons/user-group.svg"); }
+.icon-list   { -webkit-mask-image: url("../images/icons/medical-record.svg"); mask-image: url("../images/icons/medical-record.svg"); }
+.icon-add    { -webkit-mask-image: url("../images/icons/add.svg"); mask-image: url("../images/icons/add.svg"); }
+.icon-prev   { -webkit-mask-image: url("../images/icons/arrow-back.svg"); mask-image: url("../images/icons/arrow-back.svg"); }
+.icon-next   { -webkit-mask-image: url("../images/icons/arrow-forward.svg"); mask-image: url("../images/icons/arrow-forward.svg"); }
+.icon-copy   { -webkit-mask-image: url("../images/icons/copy.svg"); mask-image: url("../images/icons/copy.svg"); }
+
+.icon-inline { width: 1em; height: 1em; vertical-align: -0.12em; margin-right: 5px; }
+.icon-capsule  { background-color: var(--accent); -webkit-mask-image: url("../images/icons/capsule.svg"); mask-image: url("../images/icons/capsule.svg"); }
+.icon-success  { -webkit-mask-image: url("../images/icons/success.svg"); mask-image: url("../images/icons/success.svg"); }
+.icon-calendar { -webkit-mask-image: url("../images/icons/calendar.svg"); mask-image: url("../images/icons/calendar.svg"); }
+
 .profile-chips {
   max-width: 400px;
   margin: 0 auto 4px;
@@ -414,7 +445,7 @@ body {
 
 .med-check-item {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 10px;
   background: var(--surface);
   padding: 10px 12px;
@@ -423,10 +454,33 @@ body {
   cursor: pointer;
 }
 .med-checkbox {
-  width: 16px;
-  height: 16px;
-  margin-top: 2px;
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  flex: none;
+  border-radius: 8px;
+  background: var(--bg);
+  box-shadow: inset 3px 3px 6px var(--sd), inset -3px -3px 6px var(--sl);
   cursor: pointer;
+  position: relative;
+  transition: box-shadow 0.15s, background 0.15s;
+}
+.med-checkbox:checked {
+  background: var(--accent);
+  box-shadow: 3px 3px 6px var(--sd), -3px -3px 6px var(--sl);
+}
+.med-checkbox:checked::after {
+  content: "";
+  position: absolute;
+  left: 7.5px;
+  top: 4px;
+  width: 5px;
+  height: 9px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }
 .med-check-info {
   display: flex;

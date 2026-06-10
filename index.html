@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css?v=7"  />
+    <link rel="stylesheet" href="css/style.css?v=8"  />
   </head>
   <body>
     <div id="app">
@@ -16,7 +16,7 @@
         <h1 class="app-title">メディログ</h1>
         <div id="auth-area">
           <button id="login-btn" class="chip">Googleでログイン</button>
-          <span id="user-name" class="chip"></span><button id="logout-btn" class="chip hidden">ログアウト</button>
+          <span id="user-name" class="chip"></span><button id="logout-btn" class="chip hidden"><span class="icon icon-logout"></span>ログアウト</button>
 
         </div>
         <!-- /.auth-area -->
@@ -27,13 +27,13 @@
       <div class="cal">
         <div class="cal__head">
           <button id="prev-month-btn" class="cal__nav" aria-label="先月へ">
-            &lt;
+            <span class="icon icon-prev"></span>
           </button>
 
           <h2 id="calendar-title" class="cal__title">2026年 5月</h2>
 
           <button id="next-month-btn" class="cal__nav" aria-label="来月へ">
-            &gt;
+            <span class="icon icon-next"></span>
           </button>
         </div>
 
@@ -45,7 +45,7 @@
             class="dock-btn secondary-dock hidden"
             aria-label="共有・メンバー"
           >
-            👥
+            <span class="icon icon-share"></span>
           </button>
 
           <button
@@ -53,7 +53,7 @@
             class="dock-btn secondary-dock"
             aria-label="お薬一覧・処方履歴"
           >
-            📋
+            <span class="icon icon-list"></span>
           </button>
 
           <button
@@ -61,7 +61,7 @@
             class="dock-btn primary-dock"
             aria-label="新しいお薬を登録"
           >
-            ＋
+            <span class="icon icon-add"></span>
           </button>
         </div>
       </div>
@@ -69,7 +69,7 @@
       <div id="master-list-sheet" class="side-sheet-modal hidden">
         <div class="sheet-modal-content">
           <div class="sheet-header">
-            <h3 class="sheet-title">📋 登録医薬品の一覧・処方履歴</h3>
+            <h3 class="sheet-title">登録医薬品の一覧・処方履歴</h3>
 
             <button
               id="close-master-list-btn"
@@ -82,7 +82,7 @@
 
           <div class="sheet-body">
             <h4 class="list-section-title">
-              🟢 現在服用中のお薬（有効期間内）
+              現在服用中のお薬（有効期間内）
             </h4>
 
             <div id="active-meds-list" class="med-master-list-group"></div>
@@ -91,7 +91,7 @@
               class="list-section-title"
               style="margin-top: 28px; color: #64748b"
             >
-              📁 過去に使用した医薬品リスト
+              過去に使用した医薬品リスト
             </h4>
 
             <div id="inactive-meds-list" class="med-master-list-group"></div>
@@ -102,14 +102,14 @@
       <div id="share-sheet" class="side-sheet-modal hidden">
         <div class="sheet-modal-content">
           <div class="sheet-header">
-            <h3 class="sheet-title">👥 共有・メンバー</h3>
+            <h3 class="sheet-title">共有・メンバー</h3>
             <button id="close-share-btn" class="close-x-btn" aria-label="閉じる">×</button>
           </div>
 
           <div class="sheet-body">
             <p class="form-hint">あなたの共有コード（相手に渡して招待します）</p>
             <p><span id="my-share-code"></span></p>
-            <button id="copy-share-code-btn" class="btn-action-small">コードをコピー</button>
+            <button id="copy-share-code-btn" class="btn-action-small"><span class="icon icon-copy"></span>コードをコピー</button>
 
             <hr class="form-divider" />
 
@@ -131,7 +131,7 @@
 
       <div id="stop-date-modal" class="mini-dialog-overlay hidden">
         <div class="mini-dialog-box">
-          <h4>🛑 服用終了日の設定</h4>
+          <h4><span class="icon icon-inline icon-success"></span>服用終了日の設定</h4>
 
           <p class="form-hint">
             このお薬の服用を終了した（する）日付を選択してください。
@@ -171,7 +171,7 @@
         <div class="sheet-handle"></div>
 
         <div class="sheet-header">
-          <h3 class="sheet-title">💊 お薬情報の登録</h3>
+          <h3 class="sheet-title"><span class="icon icon-inline icon-capsule"></span>お薬情報の登録</h3>
 
           <button
             id="close-register-btn"
@@ -351,7 +351,7 @@
             class="form-group hidden master-stream-box"
           >
             <label class="form-label" style="color: #0284c7"
-              >⏱️ 頓用：今回服用した時間</label
+              >頓用：今回服用した時間</label
             >
 
             <div style="display: flex; gap: 8px; align-items: center">
@@ -403,6 +403,6 @@
       </div>
     </div>
 
-    <script type="module" src="js/app.js?v=8"></script>
+    <script type="module" src="js/app.js?v=9"></script>
   </body>
 </html>
