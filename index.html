@@ -7,62 +7,45 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css?v=4"  />
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css?v=7"  />
   </head>
   <body>
     <div id="app">
       <header class="app-header">
         <h1 class="app-title">メディログ</h1>
         <div id="auth-area">
-          <button id="login-btn">Googleでログイン</button>
-          <span id="user-name"></span><button id="logout-btn" class="hidden">ログアウト</button>
+          <button id="login-btn" class="chip">Googleでログイン</button>
+          <span id="user-name" class="chip"></span><button id="logout-btn" class="chip hidden">ログアウト</button>
 
         </div>
         <!-- /.auth-area -->
       </header>
 
-      <div id="share-area" class="hidden">
-      <p>あなたの共有コード: <span id="my-share-code"></span></p>
-      <div class="share-join-row">
-        <input type="text" id="display-name-input" placeholder="表示名（例：おばあちゃん）">
-        <button id="save-display-name-btn">表示名を保存</button>
-      </div>
+      <div id="profile-chips" class="profile-chips"></div>
 
-      <div class="share-join-row">
-         <input type="text" id="join-code-input" placeholder="共有コードを入力">
-        <button id="join-btn">このコードで参加申請</button>
-       </div>
-
-      <div>
-        プロフィール:
-         <select id="profile-select"></select>
-      </div>
-
-    <div id="pending-requests"></div>
-  </div>
-
-      <div class="calendar-card">
-        <div id="calendar-header-ui">
-          <button id="prev-month-btn" class="nav-btn" aria-label="先月へ">
+      <div class="cal">
+        <div class="cal__head">
+          <button id="prev-month-btn" class="cal__nav" aria-label="先月へ">
             &lt;
           </button>
 
-          <h2 id="calendar-title">2026年 5月</h2>
+          <h2 id="calendar-title" class="cal__title">2026年 5月</h2>
 
-          <button id="next-month-btn" class="nav-btn" aria-label="来月へ">
+          <button id="next-month-btn" class="cal__nav" aria-label="来月へ">
             &gt;
           </button>
         </div>
 
-        <div id="calendar-container"></div>
+        <div id="calendar-container" class="cal__body"></div>
 
         <div class="floating-actions-container">
           <button
-            id="floating-clear-btn"
-            class="dock-btn danger-dock"
-            aria-label="デモデータをすべて消去"
+            id="floating-share-btn"
+            class="dock-btn secondary-dock hidden"
+            aria-label="共有・メンバー"
           >
-            🗑️
+            👥
           </button>
 
           <button
@@ -115,6 +98,36 @@
           </div>
         </div>
       </div>
+
+      <div id="share-sheet" class="side-sheet-modal hidden">
+        <div class="sheet-modal-content">
+          <div class="sheet-header">
+            <h3 class="sheet-title">👥 共有・メンバー</h3>
+            <button id="close-share-btn" class="close-x-btn" aria-label="閉じる">×</button>
+          </div>
+
+          <div class="sheet-body">
+            <p class="form-hint">あなたの共有コード（相手に渡して招待します）</p>
+            <p><span id="my-share-code"></span></p>
+            <button id="copy-share-code-btn" class="btn-action-small">コードをコピー</button>
+
+            <hr class="form-divider" />
+
+            <div class="share-join-row">
+              <input type="text" id="display-name-input"  class="form-input" placeholder="表示名（例：お父さん）">
+              <button id="save-display-name-btn" class="btn-neu">表示名を保存</button>
+            </div>
+
+            <div class="share-join-row">
+              <input type="text" id="join-code-input"  class="form-input" placeholder="共有相手のコードを入力">
+              <button id="join-btn" class="btn-neu">このコードで参加申請</button>
+            </div>
+
+            <div id="pending-requests"></div>
+          </div>
+        </div>
+      </div>
+
 
       <div id="stop-date-modal" class="mini-dialog-overlay hidden">
         <div class="mini-dialog-box">
@@ -390,6 +403,6 @@
       </div>
     </div>
 
-    <script type="module" src="js/app.js?v=6"></script>
+    <script type="module" src="js/app.js?v=8"></script>
   </body>
 </html>

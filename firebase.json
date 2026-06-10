@@ -11,7 +11,8 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**",
-      "**/.git/**"
+      "**/.git/**",
+      "design-concept/**"
     ]
   }
 }

@@ -52,13 +52,18 @@ document.getElementById("save-display-name-btn").addEventListener("click", async
   alert("表示名を保存しました。");
 });
 
-document.getElementById("profile-select").addEventListener("change", (e) => {
-  activeProfileId = e.target.value;
+function switchProfile(profileId) {
+  activeProfileId = profileId;
   subscribeMedicines(activeProfileId);
   subscribeExecutions(activeProfileId);
   subscribeTonyo(activeProfileId);
   renderCalendar(currentYear, currentMonth);
-});
+
+  // チップの選択表示を更新
+  document.querySelectorAll(".profile-chip").forEach(c => {
+    c.classList.toggle("is-active", c.dataset.profileId === profileId);
+  });
+}
 
 let activeProfileId = null; //現在表示、操作をしているプロフィールのID
 let unsubMedicines = null;
@@ -76,7 +81,7 @@ onAuthStateChanged(auth, async (user) => {
     console.log("ログイン中:", user.displayName, user.uid);
     loginBtn.classList.add("hidden");
     logoutBtn.classList.remove("hidden");
-    document.getElementById("share-area").classList.remove("hidden");
+    document.getElementById("floating-share-btn").classList.remove("hidden");
     userName.textContent = user.displayName;
     document.getElementById("my-share-code").textContent = user.uid;
     subscribeJoinRequests(user.uid);
@@ -110,7 +115,7 @@ onAuthStateChanged(auth, async (user) => {
     console.log("未ログイン");
     loginBtn.classList.remove("hidden");
     logoutBtn.classList.add("hidden");
-    document.getElementById("share-area").classList.add("hidden");
+    document.getElementById("floating-share-btn").classList.add("hidden");
     userName.textContent = "";
   }
 });
@@ -203,22 +208,25 @@ function renderCalendar(year, month) {
   const weekdays = ["月", "火", "水", "木", "金", "土", "日"];
 
   const headerRow = document.createElement("div");
-  headerRow.classList.add("calendar-header-row"); 
+  headerRow.classList.add("cal__row"); 
   for (let i = 0; i < weekdays.length; i++) {
-    const slot = document.createElement("div"); slot.classList.add("calendar-header"); slot.textContent = weekdays[i];
+    const slot = document.createElement("div"); slot.classList.add("cal__dow"); slot.textContent = weekdays[i];
+    if (i === 5) slot.classList.add("sat");
+    if (i === 6) slot.classList.add("sun");
+    // 曜日は 月火水木金土日 の順なので、6番目＝土＝sat、7番目＝日＝sun
     headerRow.appendChild(slot);
   }
   container.appendChild(headerRow); 
 
   const allSlots = [];
   for (let i = 0; i < ((firstDayIndex + 6) % 7); i++) {
-    const emptySlot = document.createElement("div"); emptySlot.classList.add("calendar-day", "empty");
+    const emptySlot = document.createElement("div"); emptySlot.classList.add("cal__cell", "empty");
     allSlots.push(emptySlot); 
   }
 
   for (let day = 1; day <= totalDays; day++) {
     const daySlot = document.createElement("div");
-    daySlot.classList.add("calendar-day"); daySlot.textContent = day; daySlot.dataset.day = day; 
+    daySlot.classList.add("cal__cell"); daySlot.textContent = day; daySlot.dataset.day = day; 
     
     if (day === today.getDate() && month === (today.getMonth() + 1) && year === today.getFullYear()) {
       daySlot.classList.add("is-today");
@@ -231,11 +239,11 @@ function renderCalendar(year, month) {
 
   for (let i = 0; i < allSlots.length; i += 7) {
     const weekSlots = allSlots.slice(i, i + 7);
-    const weekRow = document.createElement("div"); weekRow.classList.add("calendar-week-row");
+    const weekRow = document.createElement("div"); weekRow.classList.add("cal__row");
     weekSlots.forEach(slot => { if(slot) weekRow.appendChild(slot); });
     
     const panel = document.createElement("div"); 
-    panel.classList.add("accordion-panel");
+    panel.classList.add("cal__panel");
     
     container.appendChild(weekRow);
     container.appendChild(panel);
@@ -250,6 +258,7 @@ function renderCalendar(year, month) {
 
         // 💡 1. 状態に応じた開閉コントロール判断
         let shouldAnimateOpen = false;
+        container.querySelectorAll(".cal__cell.is-sel").forEach(c => c.classList.remove("is-sel"));
 
         if (currentOpenedDayStr === clickedDayStr) {
           // 【パターンA】全く同じ日付を再度タップ ➔ アコーディオンを閉じる
@@ -259,7 +268,7 @@ function renderCalendar(year, month) {
         } else {
           // 【パターンB】別の日付をタップ
           // 他のすべての週アコーディオンは、閉じているかどうかにかかわらず念のためクラスを外す
-          container.querySelectorAll(".accordion-panel").forEach(p => { 
+          container.querySelectorAll(".cal__panel").forEach(p => { 
             if (p !== panel) p.classList.remove("is-open"); 
           });
 
@@ -270,6 +279,7 @@ function renderCalendar(year, month) {
           // ※同じ週の別の日であれば、panel.classListはすでに is-open を持っているので何もしない（閉じない）
           
           currentOpenedDayStr = clickedDayStr;
+          slot.classList.add("is-sel");
         }
 
         // 💡 2. カルテのHTML中身の生成（開いたままで中身だけが瞬時に切り替わる）
@@ -295,7 +305,7 @@ function renderCalendar(year, month) {
                   <label class="med-check-item">
                     <input type="checkbox" class="med-checkbox" data-master-id="${m.info.id}" data-category="${cat.id}" ${isChecked ? 'checked' : ''}>
                     <div class="med-check-info">
-                      <span class="med-check-text">${m.info.name} <span style="color: #ea580c; font-weight:700; margin-left:4px;">【 1回 ${m.info.dosages[cat.id]}錠 】</span></span>
+                      <span class="med-check-text">${m.info.name} <span style="color: var(--accent); font-weight:700; margin-left:4px;">【 1回 ${m.info.dosages[cat.id]}錠 】</span></span>
                       <span class="med-check-subtext">用法：${m.info.detailUsageText}</span>
                     </div>
                   </label>`;
@@ -306,14 +316,14 @@ function renderCalendar(year, month) {
 
           const tonyoLogs = todaysMeds.filter(m => m.type === "tonyo_log");
           if (tonyoLogs.length > 0) {
-            html += `<div class="time-category-section"><div class="time-category-header" style="color:#64748b;">🚨 症状に合わせて服用した記録（頓用）</div><div class="med-check-list">`;
+            html += `<div class="time-category-section"><div class="time-category-header" style="color:var(--text-soft);">🚨 症状に合わせて服用した記録（頓用）</div><div class="med-check-list">`;
             tonyoLogs.forEach(m => {
               html += `
-                <label class="med-check-item" style="background:#f1f5f9; cursor:default;">
+                <label class="med-check-item" style="background:var(--surface); cursor:default;">
                   <input type="checkbox" class="med-checkbox" checked disabled>
                   <div class="med-check-info">
-                    <span class="med-check-text" style="color:#475569;">${m.info.name} <span style="color: #64748b; font-weight:700; margin-left:4px;">【 1回 分頓 】</span></span>
-                    <span class="med-check-subtext" style="color:#0284c7; font-weight:700;">⏱️ ${m.timeLog} に服用済み</span>
+                    <span class="med-check-text" style="color:var(--text);">${m.info.name} <span color:var(--text); font-weight:700; margin-left:4px;">【 1回 分頓 】</span></span>
+                    <span class="med-check-subtext" style="color:var(--accent); font-weight:700;">⏱️ ${m.timeLog} に服用済み</span>
                   </div>
                 </label>`;
             });
@@ -462,15 +472,15 @@ function subscribeTonyo(uid) {
   });
 }
 
-// 自分がメンバーに入っているプロフィールを見張り、ドロップダウンに反映
+// 自分がメンバーに入っているプロフィールを見張り、チップ列に反映
 function subscribeAccessibleProfiles(uid) {
   const q = query(collection(db, "profiles"), where("members", "array-contains", uid));
 
   onSnapshot(q, (snapshot) => {
-    const select = document.getElementById("profile-select");
-    select.innerHTML = "";
+    const container = document.getElementById("profile-chips");
+    container.innerHTML = "";
 
-    // 自分のプロフィールを必ず先頭に並べる
+    // 自分のプロフィールを必ず先頭に
     const docs = snapshot.docs.slice().sort((a, b) => {
       if (a.id === uid) return -1;
       if (b.id === uid) return 1;
@@ -479,17 +489,17 @@ function subscribeAccessibleProfiles(uid) {
 
     docs.forEach((docSnap) => {
       const d = docSnap.data();
-      const option = document.createElement("option");
-      option.value = docSnap.id;
+      const chip = document.createElement("button");
+      chip.className = "profile-chip";
+      chip.dataset.profileId = docSnap.id;
       const shownName = d.profileName ?? d.ownerName ?? "名前未設定";
-      option.textContent = (docSnap.id === uid) ? `自分（${shownName}）` : `${shownName} さん`;
-      select.appendChild(option); 
+      chip.textContent = (docSnap.id === uid) ? `自分（${shownName}）` : `${shownName} さん`;
+      if (docSnap.id === activeProfileId) chip.classList.add("is-active");
+      chip.addEventListener("click", () => switchProfile(docSnap.id));
+      container.appendChild(chip);
     });
-
-    select.value = activeProfileId;
   });
 }
-
 // ==========================================================================
 // 4. マスタ履歴一覧の動的描画
 // ==========================================================================
@@ -524,7 +534,7 @@ function renderMasterListSheet() {
           <span class="med-master-card-title">💊 ${m.name}</span>
           <span class="med-master-card-meta">${m.frequency === "tonyo" ? "頓用" : m.detailUsageText}</span>
         </div>
-        <div style="font-size:11px; color:#059669; margin-top:4px;">📅 連動服用中 (開始: ${reg?reg.startDate:'--'})</div>
+        <div style="font-size:11px; color:var(--accent); margin-top:4px;">📅 連動服用中 (開始: ${reg?reg.startDate:'--'})</div>
         <div class="med-master-action-row">
           <button class="btn-action-small stop-trigger-btn" data-id="${m.id}">🛑 服用終了処理</button>
           <button class="btn-action-small delete-btn" data-id="${m.id}">🗑️ 削除</button>
@@ -534,10 +544,10 @@ function renderMasterListSheet() {
       inactiveCount++;
       card.innerHTML = `
         <div class="med-master-card-header">
-          <span class="med-master-card-title" style="color:#64748b;">📁 ${m.name}</span>
-          <span class="med-master-card-meta" style="color:#64748b;">服用終了</span>
+          <span class="med-master-card-title" style="color:var(--text-soft);">📁 ${m.name}</span>
+          <span class="med-master-card-meta" style="color:var(--text-soft);">服用終了</span>
         </div>
-        <div style="font-size:11px; color:#64748b; margin-top:4px;">⏱️ 服用期間: ${reg.startDate} ～ ${reg.endDate}</div>`;
+        <div style="font-size:11px; color:var(--text-soft); margin-top:4px;">⏱️ 服用期間: ${reg.startDate} ～ ${reg.endDate}</div>`;
       inactiveContainer.appendChild(card);
     }
   });
@@ -724,6 +734,22 @@ document.getElementById("floating-master-btn").addEventListener("click", () => {
 });
 document.getElementById("close-master-list-btn").addEventListener("click", () => {
   document.getElementById("master-list-sheet").classList.add("hidden");
+});
+document.getElementById("floating-share-btn").addEventListener("click", () => {
+  document.getElementById("share-sheet").classList.remove("hidden");
+});
+document.getElementById("close-share-btn").addEventListener("click", () => {
+  document.getElementById("share-sheet").classList.add("hidden");
+});
+document.getElementById("copy-share-code-btn").addEventListener("click", async () => {
+  const code = document.getElementById("my-share-code").textContent;
+  if (!code) return;
+  try {
+    await navigator.clipboard.writeText(code);
+    alert("共有コードをコピーしました。");
+  } catch (e) {
+    alert("コピーできませんでした。コードを長押しして選択してください。");
+  }
 });
 document.getElementById("floating-register-btn").addEventListener("click", () => {
   bottomSheet.classList.add("is-open"); sheetOverlay.classList.add("is-active");

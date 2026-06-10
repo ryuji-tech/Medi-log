@@ -1,27 +1,41 @@
 /* ==========================================================================
    Base & Layout System
    ========================================================================== */
+:root {
+  --bg: #e7eaf0;
+  --bg-2: #eef0f5;
+  --surface: #f5f7fb;
+  --surface-sunk: #e4e7ed;
+  --text: #3b4250;
+  --text-soft: #8b94a4;
+  --text-faint: #abb3c1;
+  --line: rgba(120,132,152,0.16);
+  --sd: rgba(159,168,186,0.60);   /* 暗い影 */
+  --sl: rgba(255,255,255,0.95);   /* 明るいハイライト */
+  --accent: #3f9b8f;
+  --accent-soft: #d7ece8;
+  --today: #d99a3c;
+  --today-soft: #f3e4c7;
+  --danger: #cf6b63;
+  --weekend-sat: #5b8fd6;
+  --weekend-sun: #d27b7b;
+  --font-round: 'Zen Kaku Gothic New', sans-serif;
+}
+
+.neu-raised   { box-shadow: 7px 7px 16px var(--sd), -7px -7px 16px var(--sl); }
+.neu-raised-s { box-shadow: 4px 4px 9px var(--sd), -4px -4px 9px var(--sl); }
+.neu-raised-l { box-shadow: 12px 12px 28px var(--sd), -10px -10px 24px var(--sl); }
+.neu-inset    { box-shadow: inset 4px 4px 9px var(--sd), inset -4px -4px 9px var(--sl); }
+.neu-inset-s  { box-shadow: inset 3px 3px 6px var(--sd), inset -3px -3px 6px var(--sl); }
+
 * {
   box-sizing: border-box;
 }
 body {
-  font-family: 'M PLUS Rounded 1c', 'Zen Maru Gothic', sans-serif;
-  /* CSSのフォント指定（font-family）は、「左側に書いたフォントが優先され、そのフォントに存在しない文字（または対応していない文字）があると、右側のフォントが適用される」というルール */
-  background-color: #f0fdf4; /* 💡 画像が万が一読み込めないときの極薄の水色・緑ベースの保険 */
-
-  /* WebP版を保険として指定 */
-  background:
-    linear-gradient(rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.6)),
-    url("../images/background-water.webp") no-repeat center center fixed;
-  background-size: cover;
-
-  /* 💡 ブラウザがAVIFに対応していれば、こちらで上書きされる */
-  background:
-    linear-gradient(rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.6)),
-    url("../images/background-water.avif") no-repeat center center fixed;
-  background-size: cover;
-
   overflow-x: hidden; /* 横のはみ出し対策 */
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-round);
 }
 
 
@@ -33,8 +47,13 @@ body {
 
 /* ヘッダー全体のスタイリング */
 .app-header {
-  padding: 24px 16px 12px 16px;
-  text-align: center;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 18px 8px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
 }
 
 #share-area {
@@ -48,7 +67,9 @@ body {
 
 .share-join-row {
   display: flex;
-  gap: 8px;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
 }
 .share-join-row input {
   flex: 1;
@@ -56,23 +77,105 @@ body {
 }
 
 .app-title {
-  font-family: 'M PLUS Rounded 1c', 'Zen Maru Gothic', sans-serif;
-
-  /* 💡 筆記体は少し小さく見えがちなので、24pxから「32px〜36px」あたりに設定 */
-  font-size: 36px;
+  font-family: var(--font-round);
+  font-size: 22px;
   font-weight: 700;
-
-  color: #034261; /* 清潔感のある水色 */
-  text-align: center;
-  /* text-transform: lowercase; 小文字フォルムを固定 */
-
-  /* 水の背景に埋もれないための白い光彩 */
-  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.8);
-
-  /* 上下の余白（カレンダーとの詰まり具合をここで微調整してください） */
+  color: var(--text);
   margin: 0;
-  padding: 16px 0 8px 0;
+  padding: 0;
 }
+
+/* ==========================================================================
+   📅 カレンダーカードrevised:ニューモーフィズム
+   ========================================================================== */
+.cal {
+  position: relative;
+  max-width: 400px;
+  margin: 20px auto 40px auto;
+  border-radius: 30px;
+  background: var(--surface);
+  padding: 20px 18px 80px;
+  box-shadow: 13px 13px 30px var(--sd), -11px -11px 26px var(--sl);
+}
+.cal__head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 18px;
+}
+.cal__title {
+  font-family: var(--font-round);
+  font-weight: 700; font-size: 24px; color: var(--text);
+  white-space: nowrap; margin: 0;
+}
+.cal__nav {
+  width: 40px; height: 40px; border-radius: 13px;
+  background: var(--surface); color: var(--text-soft);
+  display: grid; place-items: center;
+  border: none; cursor: pointer; font-weight: 700; font-size: 16px;
+  box-shadow: 4px 4px 9px var(--sd), -4px -4px 9px var(--sl);
+}
+.cal__nav:active {
+  box-shadow: inset 3px 3px 6px var(--sd), inset -3px -3px 6px var(--sl);
+}
+
+.cal__body { display: block; }
+.cal__row {
+  display: grid; grid-template-columns: repeat(7, 1fr);
+  gap: 8px; margin-bottom: 8px;
+}
+.cal__dow {
+  text-align: center; font-size: 13px; font-weight: 700;
+  color: var(--text-soft); padding-bottom: 6px;
+}
+.cal__dow.sat { color: var(--weekend-sat); }
+.cal__dow.sun { color: var(--weekend-sun); }
+
+.cal__cell {
+  aspect-ratio: 1 / 1; border-radius: 14px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  font-size: 17px; font-weight: 700; color: var(--text);
+  position: relative; cursor: pointer;
+  background: var(--surface);
+  box-shadow: 4px 4px 9px var(--sd), -4px -4px 9px var(--sl);
+  transition: color .15s;
+}
+.cal__cell.empty {
+  background: transparent; box-shadow: none; cursor: default;
+}
+.cal__cell.has-med::after {
+  content: ""; position: absolute; bottom: 8px;
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent);
+}
+.cal__cell.is-today {
+  background: var(--today); color: #fff;
+}
+.cal__cell.is-today.has-med::after { background: #fff; }
+.cal__cell.is-sel {
+  box-shadow: inset 4px 4px 8px var(--sd), inset -4px -4px 8px var(--sl);
+  color: var(--accent);
+}
+
+.cal__cell.is-today.is-sel {
+  color: #fff;
+  box-shadow: inset 3px 3px 7px rgba(120,75,10,0.7), inset -3px -3px 7px rgba(255,255,255,0.30);
+}
+
+/* 服薬予定のインライン展開パネル */
+.cal__panel {
+  max-height: 0; overflow: hidden;
+  margin: 0; padding: 0 16px;
+  transition: max-height .25s ease-out, padding .25s ease-out, margin .25s ease-out;
+}
+.cal__panel.is-open {
+  max-height: 1200px;
+  padding: 16px;
+  margin: 6px 2px 12px;
+  border-radius: 18px;
+  background: var(--bg);
+  box-shadow: inset 5px 5px 11px var(--sd), inset -5px -5px 11px var(--sl);
+}
+
 /* 📅 カレンダーメインカード */
 .calendar-card {
   position: relative;
@@ -89,11 +192,57 @@ body {
 
 #auth-area {
   display: flex;
-  justify-content: center;
   align-items: center;
   gap: 8px;
-  margin-top: 8px;
+  margin: 0;
 }
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 13px;
+  background: var(--surface);
+  color: var(--text-soft);
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--font-round);
+  box-shadow: 4px 4px 9px var(--sd), -4px -4px 9px var(--sl);
+}
+
+.profile-chips {
+  max-width: 400px;
+  margin: 0 auto 4px;
+  padding: 6px 8px 0;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.profile-chip {
+  padding: 9px 14px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--font-round);
+  background: var(--surface);
+  color: var(--text-soft);
+  box-shadow: 4px 4px 9px var(--sd), -4px -4px 9px var(--sl);
+}
+.profile-chip.is-active {
+  color: var(--accent);
+  box-shadow: inset 3px 3px 6px var(--sd), inset -3px -3px 6px var(--sl);
+}
+
+.chip:active {
+  box-shadow: inset 3px 3px 6px var(--sd), inset -3px -3px 6px var(--sl);
+}
+#user-name:empty { display: none; }
+
 
 /* ヘッダーUI */
 #calendar-header-ui {
@@ -232,13 +381,13 @@ body {
   margin: 0 0 16px 0;
   font-size: 14px;
   font-weight: 700;
-  color: #1e293b;
-  border-left: 3px solid #10b981;
+  color: var(--text);
+  border-left: 3px solid var(--accent);
   padding-left: 8px;
 }
 .no-medicine-msg {
   font-size: 13px;
-  color: #64748b;
+  color: var(--text-soft);
   margin: 0;
   text-align: center;
   padding: 10px 0;
@@ -254,7 +403,7 @@ body {
 .time-category-header {
   font-size: 12px;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--text);
   margin-bottom: 8px;
 }
 .med-check-list {
@@ -267,10 +416,10 @@ body {
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  background: #ffffff;
+  background: var(--surface);
   padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  border: none;
   cursor: pointer;
 }
 .med-checkbox {
@@ -286,11 +435,11 @@ body {
 .med-check-text {
   font-size: 13px;
   font-weight: 500;
-  color: #334155;
+  color: var(--text);
 }
 .med-check-subtext {
   font-size: 11px;
-  color: #64748b;
+  color: var(--text-soft);
   margin-top: 2px;
 }
 
@@ -306,43 +455,40 @@ body {
   gap: 12px;
   z-index: 90;
 }
+
 .dock-btn {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
+  width: 52px;
+  height: 52px;
+  border-radius: 17px;
   border: none;
-  font-size: 18px;
+  font-size: 20px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.12);
-  transition:
-    transform 0.2s,
-    background-color 0.2s;
+  background: var(--surface);
+  color: var(--text-soft);
+  box-shadow: 5px 5px 12px var(--sd), -5px -5px 12px var(--sl);
+  transition: box-shadow 0.15s;
 }
-.dock-btn:hover {
-  transform: translateY(-2px);
+.dock-btn:active {
+  box-shadow: inset 4px 4px 9px var(--sd), inset -4px -4px 9px var(--sl);
 }
 
 /* 主ボタン（＋） */
 .primary-dock {
-  background-color: #1e293b;
-  color: #ffffff;
-  font-size: 22px;
-}
-.primary-dock:hover {
-  background-color: #0f172a;
+  width: 60px;
+  height: 60px;
+  border-radius: 20px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 26px;
 }
 
 /* 副ボタン（📋） */
 .secondary-dock {
-  background-color: #ffffff;
-  color: #334155;
-  border: 1px solid #e2e8f0;
-}
-.secondary-dock:hover {
-  background-color: #f8fafc;
+  background: var(--surface);
+  color: var(--text-soft);
 }
 
 /* デモデータ消去ボタン（🗑️） */
@@ -372,14 +518,14 @@ body {
   content-visibility: auto; /* webp/avif描写やDOM高負荷時の最適化用 */
 }
 .sheet-modal-content {
-  background-color: #ffffff;
+  background-color: var(--bg);
   width: 92%;
   max-width: 420px;
   height: 84vh;
-  border-radius: 16px;
+  border-radius: 24px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 24px 50px -12px rgba(0,0,0,0.35);
   animation: modalUp 0.25s ease-out;
 }
 @keyframes modalUp {
@@ -398,19 +544,19 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--line);
 }
 .sheet-title {
   font-size: 15px;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--text);
   margin: 0;
 }
 .close-x-btn {
   background: none;
   border: none;
   font-size: 22px;
-  color: #94a3b8;
+  color: var(--text-faint);
   cursor: pointer;
 }
 .sheet-body {
@@ -422,18 +568,19 @@ body {
 .list-section-title {
   font-size: 12px;
   font-weight: 700;
-  color: #059669;
+  color: var(--accent);
   margin: 0 0 12px 0;
   letter-spacing: 0.5px;
 }
 
 /* 医薬品カードマスタ */
 .med-master-card {
-  background-color: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  padding: 14px;
-  margin-bottom: 10px;
+  background: var(--surface);
+  border: none;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 4px 4px 9px var(--sd), -4px -4px 9px var(--sl);
 }
 .med-master-card-header {
   display: flex;
@@ -443,38 +590,55 @@ body {
 .med-master-card-title {
   font-size: 13px;
   font-weight: 700;
-  color: #334155;
+  color: var(--text);
 }
 .med-master-card-meta {
   font-size: 11px;
-  color: #64748b;
-  background: #fff;
-  padding: 2px 6px;
-  border-radius: 4px;
-  border: 1px solid #e2e8f0;
+  color: var(--accent);
+  background: var(--bg);
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: none;
 }
 .med-master-action-row {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
   margin-top: 10px;
-  border-top: 1px dashed #e2e8f0;
+  border-top: 1px solid var(--line);
   padding-top: 8px;
 }
 .btn-action-small {
-  padding: 5px 10px;
-  font-size: 11px;
-  font-weight: 500;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-round);
+  border: none;
+  border-radius: 10px;
   cursor: pointer;
-  background: #fff;
-  color: #475569;
+  background: var(--surface);
+  color: var(--text-soft);
+  box-shadow: 3px 3px 7px var(--sd), -3px -3px 7px var(--sl);
 }
-.btn-action-small:hover {
-  background: #f8fafc;
+.btn-action-small:active {
+  box-shadow: inset 3px 3px 6px var(--sd), inset -3px -3px 6px var(--sl);
 }
-
+.btn-neu {
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--font-round);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  background: var(--surface);
+  color: var(--accent);
+  box-shadow: 4px 4px 9px var(--sd), -4px -4px 9px var(--sl);
+}
+.btn-neu:active {
+  box-shadow: inset 3px 3px 6px var(--sd), inset -3px -3px 6px var(--sl);
+}
 /* ==========================================================================
    🛑 終了日設定ミニダイアログ
    ========================================================================== */
@@ -491,7 +655,7 @@ body {
   z-index: 300;
 }
 .mini-dialog-box {
-  background: #ffffff;
+  background: var(--bg);
   padding: 20px;
   border-radius: 14px;
   width: 88%;
@@ -501,7 +665,7 @@ body {
 .mini-dialog-box h4 {
   margin: 0 0 6px 0;
   font-size: 14px;
-  color: #1e293b;
+  color: var(--text);
   font-weight: 700;
 }
 .mini-dialog-actions {
@@ -522,7 +686,7 @@ body {
   width: 100%;
   max-width: 440px;
   height: 84vh;
-  background: #ffffff;
+  background: var(--bg);
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
   transition: transform 0.28s cubic-bezier(0.32, 0.94, 0.6, 1);
@@ -555,7 +719,7 @@ body {
 .sheet-handle {
   width: 36px;
   height: 5px;
-  background-color: #cbd5e1;
+  background-color: var(--surface-sunk);
   border-radius: 3px;
   margin: 10px auto 2px auto;
   flex-shrink: 0;
@@ -570,48 +734,50 @@ body {
 .form-label {
   font-size: 13px;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--text-soft);
   margin-bottom: 8px;
 }
 .form-input,
 .form-select {
   width: 100%;
-  padding: 10px 12px;
-  font-size: 13px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  background-color: #fff;
-  color: #334155;
+  padding: 12px 14px;
+  font-size: 14px;
+  border: none;
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--text);
   outline: none;
+  box-shadow: inset 3px 3px 6px var(--sd), inset -3px -3px 6px var(--sl);
 }
 .form-input:focus,
 .form-select:focus {
-  border-color: #1e293b;
+  box-shadow: inset 4px 4px 8px var(--sd), inset -4px -4px 8px var(--sl);
 }
 .form-divider {
   border: 0;
-  border-top: 1px solid #f1f5f9;
+  border-top: 1px solid var(--line);
   margin: 16px 0;
 }
 .required-tag {
   font-size: 10px;
-  color: #ef4444;
-  background: #fef2f2;
+  color: var(--danger);
+  background: transparent;
   padding: 1px 4px;
   border-radius: 4px;
   margin-left: 4px;
 }
 .form-hint {
   font-size: 11px;
-  color: #64748b;
+  color: var(--text-soft);
   margin: 0;
 }
 
 .master-stream-box {
-  background-color: #f8fafc;
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid #e2e8f0;
+  background: var(--surface);
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  box-shadow: 4px 4px 9px var(--sd), -4px -4px 9px var(--sl);
 }
 
 .duration-inputs input {
@@ -654,14 +820,16 @@ body {
 }
 .weekday-btn {
   font-size: 12px;
-  padding: 6px 10px;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  background: #fff;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 4px;
+  box-shadow: 3px 3px 6px var(--sd), -3px -3px 6px var(--sl);
 }
 .input-unit-wrapper {
   display: flex;
@@ -670,22 +838,24 @@ body {
 }
 .input-unit-text {
   font-size: 12px;
-  color: #475569;
+  color: var(--text-soft);
 }
 
 .submit-btn {
-  background-color: #1e293b;
+  background: var(--accent);
   color: #fff;
   border: none;
-  padding: 12px;
-  font-size: 14px;
+  padding: 15px;
+  font-size: 15px;
   font-weight: 700;
-  border-radius: 8px;
+  font-family: var(--font-round);
+  border-radius: 16px;
   cursor: pointer;
   margin-top: 10px;
+  box-shadow: 5px 5px 12px var(--sd), -5px -5px 12px var(--sl);
 }
-.submit-btn:hover {
-  background-color: #0f172a;
+.submit-btn:active {
+  box-shadow: inset 4px 4px 8px var(--sd), inset -4px -4px 8px var(--sl);
 }
 
 /* 共通非表示ユーティリティ */
