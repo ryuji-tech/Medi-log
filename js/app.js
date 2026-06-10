@@ -434,6 +434,7 @@ function subscribeMedicines(uid) {
         detailUsageText: d.detailUsageText,
         dosages: d.dosages,
         categories: d.categories,
+        category: d.category ?? "medical", // 旧データはカテゴリ未設定→医療用医薬品扱い
         tonyoRecords: []
       });
 
@@ -675,6 +676,7 @@ function renderMasterListSheet() {
   systemToday.setHours(0,0,0,0);
 
   let activeCount = 0; let inactiveCount = 0;
+  const activeByCat = { medical: [], otc: [], supplement: [] }; // カテゴリ別の服用中カード
 
   medicineMaster.forEach(m => {
     if (m.status !== "active") return;
@@ -702,7 +704,7 @@ function renderMasterListSheet() {
           <button class="btn-action-small stop-trigger-btn" data-id="${m.id}"><span class="icon icon-inline icon-success"></span>服用終了処理</button>
           <button class="btn-action-small delete-btn" data-id="${m.id}">削除</button>
         </div>`;
-      activeContainer.appendChild(card);
+      (activeByCat[m.category] ?? activeByCat.medical).push(card);
     } else {
       inactiveCount++;
       card.innerHTML = `
@@ -713,6 +715,18 @@ function renderMasterListSheet() {
         <div style="font-size:11px; color:var(--text-soft); margin-top:4px;"><span class="icon icon-inline icon-clock"></span>服用期間: ${reg.startDate} ～ ${reg.endDate}</div>`;
       inactiveContainer.appendChild(card);
     }
+  });
+
+  // カテゴリ別に見出しを付けて服用中カードを並べる
+  const catLabels = { medical: "医療用医薬品", otc: "市販薬（OTC）", supplement: "健康食品・サプリメント" };
+  ["medical", "otc", "supplement"].forEach(catKey => {
+    const cards = activeByCat[catKey];
+    if (!cards.length) return;
+    const heading = document.createElement("div");
+    heading.className = "cat-group-title";
+    heading.textContent = catLabels[catKey];
+    activeContainer.appendChild(heading);
+    cards.forEach(c => activeContainer.appendChild(c));
   });
 
   if (activeCount === 0) activeContainer.innerHTML = '<p class="no-medicine-msg">現在服用中のアクティブなお薬はありません。</p>';
@@ -775,6 +789,8 @@ document.getElementById("quote-medicine-select").addEventListener("change", (e) 
   const target = medicineMaster.find(m => m.id === id); if (!target) return;
 
   document.getElementById("med-name").value = target.name;
+  const cat = target.category ?? "medical";
+  document.querySelector(`input[name="med-category"][value="${cat}"]`).checked = true;
   frequencySelect.value = target.frequency; frequencySelect.dispatchEvent(new Event("change"));
   document.querySelector(`input[name="med-period-type"][value="${target.periodType}"]`).checked = true;
   document.querySelector(`input[name="med-period-type"][value="${target.periodType}"]`).dispatchEvent(new Event("change"));
@@ -811,6 +827,8 @@ document.getElementById("submit-register-btn").addEventListener("click", async (
   else if (frequency === "2") { categories.morning = true; categories.evening = true; dosages.morning = uniformAmount; dosages.evening = uniformAmount; }
   else if (frequency === "1") { categories.morning = true; dosages.morning = uniformAmount; }
 
+  const category = document.querySelector('input[name="med-category"]:checked').value;
+
   // Firestoreに薬を登録
   const user = auth.currentUser;
   if (!user) { showToast("ログインしてください。"); return; }
@@ -825,6 +843,7 @@ document.getElementById("submit-register-btn").addEventListener("click", async (
     detailUsageText,
     dosages,
     categories,
+    category,
     startDate,
     endDate,
     createdAt: serverTimestamp()
@@ -849,6 +868,7 @@ document.getElementById("submit-register-btn").addEventListener("click", async (
   
   // フォームクリア
   document.getElementById("med-name").value = "";
+  document.querySelector('input[name="med-category"][value="medical"]').checked = true;
   frequencySelect.value = ""; frequencySelect.dispatchEvent(new Event("change"));
 
   renderCalendar(currentYear, currentMonth);

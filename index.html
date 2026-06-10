@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css?v=19"  />
+    <link rel="stylesheet" href="css/style.css?v=21"  />
   </head>
   <body>
     <div id="app">
@@ -364,7 +364,30 @@
 
           <div class="form-group">
             <label class="form-label"
-              >2. 服用期間 <span class="required-tag">必須</span></label
+              >2. カテゴリ <span class="required-tag">必須</span></label
+            >
+
+            <div class="schedule-radio-group">
+              <label class="schedule-radio-label"
+                ><input type="radio" name="med-category" value="medical" checked />
+                医療用医薬品</label
+              >
+
+              <label class="schedule-radio-label"
+                ><input type="radio" name="med-category" value="otc" />
+                市販薬（OTC）</label
+              >
+
+              <label class="schedule-radio-label"
+                ><input type="radio" name="med-category" value="supplement" />
+                健康食品・サプリメント</label
+              >
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label"
+              >3. 服用期間 <span class="required-tag">必須</span></label
             >
 
             <div class="duration-inputs">
@@ -380,7 +403,7 @@
           </div>
 
           <div id="schedule-group" class="form-group">
-            <label class="form-label">3. 服用のスケジュール判定</label>
+            <label class="form-label">4. 服用のスケジュール判定</label>
 
             <div class="schedule-radio-group">
               <label class="schedule-radio-label"
@@ -462,7 +485,7 @@
 
           <div class="form-group">
             <label for="med-frequency" class="form-label"
-              >4. 1日の服用回数 <span class="required-tag">必須</span></label
+              >5. 1日の服用回数 <span class="required-tag">必須</span></label
             >
 
             <select id="med-frequency" class="form-select">
@@ -480,7 +503,7 @@
 
           <div id="detail-usage-group" class="form-group hidden">
             <label for="med-detail-usage" class="form-label"
-              >5. 服用の詳しいタイミング</label
+              >6. 服用の詳しいタイミング</label
             >
 
             <select id="med-detail-usage" class="form-select"></select>
@@ -520,7 +543,7 @@
           </div>
 
           <div id="dosage-group" class="form-group hidden">
-            <label class="form-label">6. 1回にのむ量</label>
+            <label class="form-label">7. 1回にのむ量</label>
 
             <div class="input-unit-wrapper">
               <input
@@ -548,6 +571,6 @@
       </div>
     </div>
 
-    <script type="module" src="js/app.js?v=18"></script>
+    <script type="module" src="js/app.js?v=20"></script>
   </body>
 </html>

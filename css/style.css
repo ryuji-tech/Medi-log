@@ -634,6 +634,13 @@ body {
   margin: 0 0 12px 0;
   letter-spacing: 0.5px;
 }
+.cat-group-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-soft);
+  margin: 14px 0 8px;
+  padding-left: 2px;
+}
 
 /* 医薬品カードマスタ */
 .med-master-card {
