@@ -237,7 +237,7 @@ body {
 
 .icon-logout { -webkit-mask-image: url("../images/icons/logout.svg"); mask-image: url("../images/icons/logout.svg"); }
 .icon-share  { -webkit-mask-image: url("../images/icons/user-group.svg"); mask-image: url("../images/icons/user-group.svg"); }
-.icon-list   { -webkit-mask-image: url("../images/icons/medical-record.svg"); mask-image: url("../images/icons/medical-record.svg"); }
+.icon-list   { -webkit-mask-image: url("../images/icons/capsule.svg"); mask-image: url("../images/icons/capsule.svg"); }
 .icon-add    { -webkit-mask-image: url("../images/icons/add.svg"); mask-image: url("../images/icons/add.svg"); }
 .icon-prev   { -webkit-mask-image: url("../images/icons/arrow-back.svg"); mask-image: url("../images/icons/arrow-back.svg"); }
 .icon-next   { -webkit-mask-image: url("../images/icons/arrow-forward.svg"); mask-image: url("../images/icons/arrow-forward.svg"); }
@@ -248,7 +248,10 @@ body {
 .icon-success  { -webkit-mask-image: url("../images/icons/success.svg"); mask-image: url("../images/icons/success.svg"); }
 .icon-calendar { -webkit-mask-image: url("../images/icons/calendar.svg"); mask-image: url("../images/icons/calendar.svg"); }
 .icon-health   { -webkit-mask-image: url("../images/icons/heart-rate.svg"); mask-image: url("../images/icons/heart-rate.svg"); }
-.icon-history  { -webkit-mask-image: url("../images/icons/history.svg"); mask-image: url("../images/icons/history.svg"); }
+.icon-history  { -webkit-mask-image: url("../images/icons/medical-record.svg"); mask-image: url("../images/icons/medical-record.svg"); }
+.icon-folder   { -webkit-mask-image: url("../images/icons/folder.svg"); mask-image: url("../images/icons/folder.svg"); }
+.icon-clock    { -webkit-mask-image: url("../images/icons/history.svg"); mask-image: url("../images/icons/history.svg"); }
+.icon-warning  { -webkit-mask-image: url("../images/icons/warning.svg"); mask-image: url("../images/icons/warning.svg"); }
 .profile-chips {
   max-width: 400px;
   margin: 0 auto 4px;

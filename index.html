@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css?v=17"  />
+    <link rel="stylesheet" href="css/style.css?v=19"  />
   </head>
   <body>
     <div id="app">
@@ -51,7 +51,7 @@
           <button
             id="floating-health-btn"
             class="dock-btn secondary-dock hidden"
-            aria-label="体質・受診メモ"
+            aria-label="既往歴・ワクチン接種歴"
           >
             <span class="icon icon-health"></span>
           </button>
@@ -59,7 +59,7 @@
           <button
             id="floating-history-btn"
             class="dock-btn secondary-dock hidden"
-            aria-label="既往歴・ワクチン接種歴"
+            aria-label="体質・受診メモ"
           >
             <span class="icon icon-history"></span>
           </button>
@@ -225,7 +225,7 @@
 
       <div id="delete-med-modal" class="mini-dialog-overlay hidden">
         <div class="mini-dialog-box">
-          <h4>🗑️ お薬の削除</h4>
+          <h4><span class="icon icon-inline icon-warning"></span>お薬の削除</h4>
           <p class="form-hint">
             「<span id="delete-med-name"></span>」をシステムから完全に削除しますか？過去のカレンダーからも履歴が消えます。
           </p>
@@ -548,6 +548,6 @@
       </div>
     </div>
 
-    <script type="module" src="js/app.js?v=16"></script>
+    <script type="module" src="js/app.js?v=18"></script>
   </body>
 </html>

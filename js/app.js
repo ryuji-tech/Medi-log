@@ -26,9 +26,9 @@ document.getElementById("join-btn").addEventListener("click", async () => {
   const code = document.getElementById("join-code-input").value.trim();
   const user = auth.currentUser;
 
-  if (!user) { alert("ログインしてください。"); return; }
-  if (!code) { alert("共有コードを入力してください。"); return; }
-  if (code === user.uid) { alert("自分のコードには参加できません。"); return; }
+  if (!user) { showToast("ログインしてください。"); return; }
+  if (!code) { showToast("共有コードを入力してください。"); return; }
+  if (code === user.uid) { showToast("自分のコードには参加できません。"); return; }
 
   // 相手のプロフィールの下に「参加申請」を作る
   await setDoc(doc(db, "profiles", code, "joinRequests", user.uid), {
@@ -37,24 +37,24 @@ document.getElementById("join-btn").addEventListener("click", async () => {
     createdAt: serverTimestamp()
   });
 
-  alert("参加申請を送りました。相手の承認をお待ちください。");
+  showToast("参加申請を送りました。相手の承認をお待ちください。");
   document.getElementById("join-code-input").value = "";
 });
 
 document.getElementById("save-display-name-btn").addEventListener("click", async () => {
   const user = auth.currentUser;
-  if (!user) { alert("ログインしてください。"); return; }
+  if (!user) { showToast("ログインしてください。"); return; }
 
   const name = document.getElementById("display-name-input").value.trim();
-  if (!name) { alert("表示名を入力してください。"); return; }
+  if (!name) { showToast("表示名を入力してください。"); return; }
 
   await updateDoc(doc(db, "profiles", user.uid), { profileName: name });
-  alert("表示名を保存しました。");
+  showToast("表示名を保存しました。");
 });
 
 document.getElementById("save-health-profile-btn").addEventListener("click", async () => {
   const user = auth.currentUser;
-  if (!user) { alert("ログインしてください。"); return; }
+  if (!user) { showToast("ログインしてください。"); return; }
 
   const ref = doc(db, "profiles", activeProfileId, "meta", "healthProfile");
   try {
@@ -364,7 +364,7 @@ function renderCalendar(year, month) {
                   <input type="checkbox" class="med-checkbox" checked disabled>
                   <div class="med-check-info">
                     <span class="med-check-text" style="color:var(--text);">${m.info.name} <span color:var(--text); font-weight:700; margin-left:4px;">【 1回 分頓 】</span></span>
-                    <span class="med-check-subtext" style="color:var(--accent); font-weight:700;">⏱️ ${m.timeLog} に服用済み</span>
+                    <span class="med-check-subtext" style="color:var(--accent); font-weight:700;"><span class="icon icon-inline icon-clock"></span>${m.timeLog} に服用済み</span>
                   </div>
                 </label>`;
             });
@@ -707,10 +707,10 @@ function renderMasterListSheet() {
       inactiveCount++;
       card.innerHTML = `
         <div class="med-master-card-header">
-          <span class="med-master-card-title" style="color:var(--text-soft);">📁 ${m.name}</span>
+          <span class="med-master-card-title" style="color:var(--text-soft);"><span class="icon icon-inline icon-folder"></span>${m.name}</span>
           <span class="med-master-card-meta" style="color:var(--text-soft);">服用終了</span>
         </div>
-        <div style="font-size:11px; color:var(--text-soft); margin-top:4px;">⏱️ 服用期間: ${reg.startDate} ～ ${reg.endDate}</div>`;
+        <div style="font-size:11px; color:var(--text-soft); margin-top:4px;"><span class="icon icon-inline icon-clock"></span>服用期間: ${reg.startDate} ～ ${reg.endDate}</div>`;
       inactiveContainer.appendChild(card);
     }
   });
@@ -792,7 +792,7 @@ document.getElementById("submit-register-btn").addEventListener("click", async (
   const endDate = document.getElementById("med-end-date").value;
   const frequency = frequencySelect.value;
 
-  if (!name || !startDate || !frequency) { alert("必須項目に入力漏れがあります。"); return; }
+  if (!name || !startDate || !frequency) { showToast("必須項目に入力漏れがあります。"); return; }
 
   let periodType = document.querySelector('input[name="med-period-type"]:checked').value;
   let targetDays = []; let intervalDays = 0;
@@ -813,7 +813,7 @@ document.getElementById("submit-register-btn").addEventListener("click", async (
 
   // Firestoreに薬を登録
   const user = auth.currentUser;
-  if (!user) { alert("ログインしてください。"); return; }
+  if (!user) { showToast("ログインしてください。"); return; }
 
   const medRef = await addDoc(collection(db, "profiles", activeProfileId, "medicines"), {
     name,
@@ -844,7 +844,7 @@ document.getElementById("submit-register-btn").addEventListener("click", async (
 
   console.log("Firestoreに薬を保存しました:", name);
 
-  alert(`「${name}」を新しく登録しました。`);
+  showToast(`「${name}」を新しく登録しました。`);
   bottomSheet.classList.remove("is-open"); sheetOverlay.classList.remove("is-active");
   
   // フォームクリア
@@ -870,7 +870,7 @@ document.getElementById("next-month-btn").addEventListener("click", () => {
 
 document.getElementById("confirm-stop-btn").addEventListener("click", async () => {
   const chosenDate = document.getElementById("stop-med-date-input").value;
-  if (!chosenDate) { alert("終了日を指定してください。"); return; }
+  if (!chosenDate) { showToast("終了日を指定してください。"); return; }
 
   const reg = registeredMedicines.find(r => r.masterId === activeTargetMasterIdForStop);
   const med = medicineMaster.find(m => m.id === activeTargetMasterIdForStop);
@@ -922,20 +922,21 @@ document.getElementById("floating-share-btn").addEventListener("click", () => {
 document.getElementById("close-share-btn").addEventListener("click", () => {
   document.getElementById("share-sheet").classList.add("hidden");
 });
+// 導線入れ替え：ハート側ボタン(floating-health-btn)は「既往歴・ワクチン」を開く
+// ※ confirm()はBrave等でブロックされるため、開く前の確認はアプリ内モーダル
 document.getElementById("floating-health-btn").addEventListener("click", () => {
-  document.getElementById("health-sheet").classList.remove("hidden");
-  updateHealthTargetLabel();
-  autoGrow(document.getElementById("hp-allergy"));
-  autoGrow(document.getElementById("hp-side-effect"));
+  document.getElementById("history-gate-modal").classList.remove("hidden");
 });
 document.getElementById("close-health-btn").addEventListener("click", () => {
   document.getElementById("health-sheet").classList.add("hidden");
 });
 
-// 既往歴・ワクチンは開く前にワンクッション確認（パスワードロックはしない）
-// ※ confirm()はBrave等でブロックされるため、アプリ内モーダルで確認する
+// 導線入れ替え：medical-record側ボタン(floating-history-btn)は「体質・受診メモ」を開く
 document.getElementById("floating-history-btn").addEventListener("click", () => {
-  document.getElementById("history-gate-modal").classList.remove("hidden");
+  document.getElementById("health-sheet").classList.remove("hidden");
+  updateHealthTargetLabel();
+  autoGrow(document.getElementById("hp-allergy"));
+  autoGrow(document.getElementById("hp-side-effect"));
 });
 document.getElementById("cancel-history-gate-btn").addEventListener("click", () => {
   document.getElementById("history-gate-modal").classList.add("hidden");
@@ -958,7 +959,7 @@ document.getElementById("add-vaccine-btn").addEventListener("click", () => {
 
 document.getElementById("save-history-btn").addEventListener("click", async () => {
   const user = auth.currentUser;
-  if (!user) { alert("ログインしてください。"); return; }
+  if (!user) { showToast("ログインしてください。"); return; }
 
   // 全項目空のワクチン行は保存しない
   const cleanVaccines = vaccineDraft
@@ -1003,9 +1004,9 @@ document.getElementById("copy-share-code-btn").addEventListener("click", async (
   if (!code) return;
   try {
     await navigator.clipboard.writeText(code);
-    alert("共有コードをコピーしました。");
+    showToast("共有コードをコピーしました。");
   } catch (e) {
-    alert("コピーできませんでした。コードを長押しして選択してください。");
+    showToast("コピーできませんでした。コードを長押しして選択してください。");
   }
 });
 document.getElementById("floating-register-btn").addEventListener("click", () => {
