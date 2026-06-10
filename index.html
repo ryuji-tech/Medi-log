@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css?v=16"  />
+    <link rel="stylesheet" href="css/style.css?v=17"  />
   </head>
   <body>
     <div id="app">
@@ -219,6 +219,27 @@
             </div>
 
             <button id="save-history-btn" class="submit-btn">この内容で保存する</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="delete-med-modal" class="mini-dialog-overlay hidden">
+        <div class="mini-dialog-box">
+          <h4>🗑️ お薬の削除</h4>
+          <p class="form-hint">
+            「<span id="delete-med-name"></span>」をシステムから完全に削除しますか？過去のカレンダーからも履歴が消えます。
+          </p>
+          <div class="mini-dialog-actions">
+            <button id="cancel-delete-med-btn" class="btn-action-small">
+              キャンセル
+            </button>
+            <button
+              id="confirm-delete-med-btn"
+              class="btn-action-small"
+              style="background-color:#df2a2a; color:#fff; border:none; font-weight:700;"
+            >
+              削除する
+            </button>
           </div>
         </div>
       </div>
@@ -527,6 +548,6 @@
       </div>
     </div>
 
-    <script type="module" src="js/app.js?v=15"></script>
+    <script type="module" src="js/app.js?v=16"></script>
   </body>
 </html>

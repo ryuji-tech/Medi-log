@@ -175,6 +175,7 @@ let currentYear = today.getFullYear();
 let currentMonth = today.getMonth() + 1;
 
 let activeTargetMasterIdForStop = null; // 服用終了処理中のお薬IDを一時保持
+let pendingDeleteMasterId = null;       // 削除確認中のお薬IDを一時保持
 let currentOpenedDayStr = null;         // 💡 現在アコーディオンが開いている「年-月-日」を保持するステート
 
 
@@ -596,7 +597,7 @@ function renderVaccines() {
     const del = document.createElement("button");
     del.type = "button";
     del.className = "vaccine-delete";
-    del.textContent = "🗑️ この行を削除";
+    del.textContent = "この行を削除";
     del.addEventListener("click", () => { vaccineDraft.splice(idx, 1); renderVaccines(); });
 
     card.appendChild(nameInput);
@@ -699,7 +700,7 @@ function renderMasterListSheet() {
         <div style="font-size:11px; color:var(--accent); margin-top:4px;"><span class="icon icon-inline icon-calendar"></span>連動服用中 (開始: ${reg?reg.startDate:'--'})</div>
         <div class="med-master-action-row">
           <button class="btn-action-small stop-trigger-btn" data-id="${m.id}"><span class="icon icon-inline icon-success"></span>服用終了処理</button>
-          <button class="btn-action-small delete-btn" data-id="${m.id}">🗑️ 削除</button>
+          <button class="btn-action-small delete-btn" data-id="${m.id}">削除</button>
         </div>`;
       activeContainer.appendChild(card);
     } else {
@@ -726,16 +727,14 @@ function renderMasterListSheet() {
   });
 
 document.querySelectorAll(".delete-btn").forEach(btn => {
-    btn.addEventListener("click", async () => {
+    btn.addEventListener("click", () => {
+      // confirm()はBraveでブロックされるため、アプリ内モーダルで確認する
       const id = btn.dataset.id;
       const target = medicineMaster.find(m => m.id === id);
-      const user = auth.currentUser;
-      if (target && user && confirm(`「${target.name}」をシステムから完全に削除しますか？\n（過去のカレンダーからも履歴が消えます）`)) {
-        target.status = "deleted"; // 画面を即反映するための楽観的更新
-        await updateDoc(doc(db, "profiles", activeProfileId, "medicines", id), { status: "deleted" });
-        renderMasterListSheet();
-        renderCalendar(currentYear, currentMonth);
-      }
+      if (!target) return;
+      pendingDeleteMasterId = id;
+      document.getElementById("delete-med-name").textContent = target.name;
+      document.getElementById("delete-med-modal").classList.remove("hidden");
     });
   });
 }
@@ -880,15 +879,35 @@ document.getElementById("confirm-stop-btn").addEventListener("click", async () =
   if (reg && med && user) {
     reg.endDate = chosenDate; // 楽観的更新
     await updateDoc(doc(db, "profiles", activeProfileId, "medicines", med.id), { endDate: chosenDate });
-    alert(`「${med.name}」の終了日を ${chosenDate} に保存しました。`);
     document.getElementById("stop-date-modal").classList.add("hidden");
     renderMasterListSheet();
     renderCalendar(currentYear, currentMonth);
+    showToast(`終了日を ${chosenDate} に保存しました`);
   }
 });
 
 document.getElementById("cancel-stop-btn").addEventListener("click", () => {
   document.getElementById("stop-date-modal").classList.add("hidden");
+});
+
+// お薬削除の確認モーダル（confirm()はBraveでブロックされるため）
+document.getElementById("cancel-delete-med-btn").addEventListener("click", () => {
+  document.getElementById("delete-med-modal").classList.add("hidden");
+  pendingDeleteMasterId = null;
+});
+document.getElementById("confirm-delete-med-btn").addEventListener("click", async () => {
+  const id = pendingDeleteMasterId;
+  const target = medicineMaster.find(m => m.id === id);
+  const user = auth.currentUser;
+  if (!id || !target || !user) return;
+
+  target.status = "deleted"; // 画面を即反映するための楽観的更新
+  await updateDoc(doc(db, "profiles", activeProfileId, "medicines", id), { status: "deleted" });
+  document.getElementById("delete-med-modal").classList.add("hidden");
+  pendingDeleteMasterId = null;
+  renderMasterListSheet();
+  renderCalendar(currentYear, currentMonth);
+  showToast("お薬を削除しました");
 });
 
 document.getElementById("floating-master-btn").addEventListener("click", () => {
