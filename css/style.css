@@ -142,9 +142,13 @@ body {
 .cal__cell.empty {
   background: transparent; box-shadow: none; cursor: default;
 }
+.cal__cell.has-med {
+  color: var(--accent);
+}
 .cal__cell.has-med::after {
   content: ""; position: absolute; bottom: 8px;
-  width: 6px; height: 6px; border-radius: 50%;
+  left: 50%; transform: translateX(-50%);
+  width: 16px; height: 3px; border-radius: 2px;
   background: var(--accent);
 }
 .cal__cell.is-today {
@@ -243,7 +247,7 @@ body {
 .icon-capsule  { background-color: var(--accent); -webkit-mask-image: url("../images/icons/capsule.svg"); mask-image: url("../images/icons/capsule.svg"); }
 .icon-success  { -webkit-mask-image: url("../images/icons/success.svg"); mask-image: url("../images/icons/success.svg"); }
 .icon-calendar { -webkit-mask-image: url("../images/icons/calendar.svg"); mask-image: url("../images/icons/calendar.svg"); }
-
+.icon-health   { -webkit-mask-image: url("../images/icons/heart-rate.svg"); mask-image: url("../images/icons/heart-rate.svg"); }
 .profile-chips {
   max-width: 400px;
   margin: 0 auto 4px;
@@ -806,6 +810,128 @@ body {
 .form-input:focus,
 .form-select:focus {
   box-shadow: inset 4px 4px 8px var(--sd), inset -4px -4px 8px var(--sl);
+}
+
+/* 体質メモ：iOSの自動ズーム（=横スクロールの揺れ）を防ぐため16px。textareaは自動拡張 */
+#health-sheet .form-input {
+  font-size: 16px;
+}
+#health-sheet textarea.form-input {
+  resize: none;
+  overflow: hidden;
+  min-height: 48px;
+  line-height: 1.5;
+}
+
+/* 保存完了トースト（チェックマークがふわっと出て消える） */
+.toast {
+  position: fixed;
+  left: 50%;
+  top: 24px;
+  bottom: auto;
+  transform: translateX(-50%) translateY(-20px);
+  background: var(--bg);
+  color: var(--text);
+  padding: 14px 22px;
+  border-radius: 16px;
+  box-shadow: 6px 6px 14px var(--sd), -6px -6px 14px var(--sl);
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  z-index: 9999;
+}
+.toast.is-show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.toast .icon-success {
+  background-color: var(--accent);
+}
+
+/* 「誰のものか」を明示する共通バナー（体質メモ・お薬一覧・登録・共有で使用） */
+.target-banner {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 14px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  margin-bottom: 14px;
+}
+
+/* 登録フォームのチェックボックス・ラジオを服薬チェックと同じ世界観に */
+.weekday-btn input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  flex: none;
+  border-radius: 6px;
+  background: var(--bg);
+  box-shadow: inset 2px 2px 4px var(--sd), inset -2px -2px 4px var(--sl);
+  position: relative;
+  cursor: pointer;
+}
+.weekday-btn input[type="checkbox"]:checked {
+  background: var(--accent);
+  box-shadow: 2px 2px 4px var(--sd), -2px -2px 4px var(--sl);
+}
+.weekday-btn input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 3px;
+  width: 4px;
+  height: 8px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.weekday-btn:has(input:checked) {
+  color: var(--accent);
+}
+.schedule-radio-label input[type="radio"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  flex: none;
+  border-radius: 50%;
+  background: var(--bg);
+  box-shadow: inset 2px 2px 4px var(--sd), inset -2px -2px 4px var(--sl);
+  position: relative;
+  cursor: pointer;
+}
+.schedule-radio-label input[type="radio"]:checked {
+  background: var(--accent);
+  box-shadow: 2px 2px 4px var(--sd), -2px -2px 4px var(--sl);
+}
+.schedule-radio-label input[type="radio"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 6px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fff;
+}
+.schedule-radio-label:has(input:checked) {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* 登録フォーム：入力時のiOS自動ズーム（左右ブレ）を防ぐため16px */
+#register-bottom-sheet .form-input,
+#register-bottom-sheet .form-select {
+  font-size: 16px;
 }
 .form-divider {
   border: 0;

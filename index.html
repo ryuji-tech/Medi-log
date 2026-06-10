@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css?v=8"  />
+    <link rel="stylesheet" href="css/style.css?v=14"  />
   </head>
   <body>
     <div id="app">
@@ -49,6 +49,14 @@
           </button>
 
           <button
+            id="floating-health-btn"
+            class="dock-btn secondary-dock hidden"
+            aria-label="体質・受診メモ"
+          >
+            <span class="icon icon-health"></span>
+          </button>
+
+          <button
             id="floating-master-btn"
             class="dock-btn secondary-dock"
             aria-label="お薬一覧・処方履歴"
@@ -81,6 +89,10 @@
           </div>
 
           <div class="sheet-body">
+            <div class="target-banner">
+              <span class="icon icon-inline icon-list"></span><span class="target-name"></span> さんのお薬
+            </div>
+
             <h4 class="list-section-title">
               現在服用中のお薬（有効期間内）
             </h4>
@@ -107,6 +119,9 @@
           </div>
 
           <div class="sheet-body">
+            <div class="target-banner">
+              <span class="icon icon-inline icon-share"></span><span id="share-owner-name"></span> さん（ログイン中の本人）の共有設定
+            </div>
             <p class="form-hint">あなたの共有コード（相手に渡して招待します）</p>
             <p><span id="my-share-code"></span></p>
             <button id="copy-share-code-btn" class="btn-action-small"><span class="icon icon-copy"></span>コードをコピー</button>
@@ -128,6 +143,43 @@
         </div>
       </div>
 
+      <div id="health-sheet" class="side-sheet-modal hidden">
+        <div class="sheet-modal-content">
+          <div class="sheet-header">
+            <h3 class="sheet-title"><span class="icon icon-inline icon-health"></span>体質・受診メモ</h3>
+            <button id="close-health-btn" class="close-x-btn" aria-label="閉じる">×</button>
+          </div>
+
+          <div class="sheet-body">
+            <div class="target-banner">
+              <span class="icon icon-inline icon-health"></span><span class="target-name"></span> さんの体質メモ
+            </div>
+            <p class="form-hint">受診時に医療者へ伝える基礎メモです。空欄のままでも構いません。</p>
+
+            <div class="form-group">
+              <label for="hp-allergy" class="form-label">アレルギー（薬・食物など）</label>
+              <textarea id="hp-allergy" class="form-input" rows="3" placeholder="例：ペニシリン系で発疹、卵アレルギー"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="hp-side-effect" class="form-label">過去の副作用歴</label>
+              <textarea id="hp-side-effect" class="form-input" rows="3" placeholder="例：ロキソニンで胃痛"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="hp-asthma" class="form-label">喘息の既往</label>
+              <input type="text" id="hp-asthma" class="form-input" placeholder="例：小児期にあり / なし">
+            </div>
+
+            <div class="form-group">
+              <label for="hp-smoking" class="form-label">喫煙習慣</label>
+              <input type="text" id="hp-smoking" class="form-input" placeholder="例：1日10本×20年 / 吸わない">
+            </div>
+
+            <button id="save-health-profile-btn" class="submit-btn">この内容で保存する</button>
+          </div>
+        </div>
+      </div>
 
       <div id="stop-date-modal" class="mini-dialog-overlay hidden">
         <div class="mini-dialog-box">
@@ -183,6 +235,10 @@
         </div>
 
         <div class="sheet-body">
+          <div class="target-banner">
+            <span class="icon icon-inline icon-capsule"></span><span class="target-name"></span> さんへ登録します
+          </div>
+
           <div class="form-group master-stream-box">
             <label class="form-label">登録方式の選択</label>
 
@@ -401,8 +457,13 @@
           </button>
         </div>
       </div>
+
+      <div id="toast" class="toast">
+        <span class="icon icon-inline icon-success"></span>
+        <span id="toast-msg">保存しました</span>
+      </div>
     </div>
 
-    <script type="module" src="js/app.js?v=9"></script>
+    <script type="module" src="js/app.js?v=13"></script>
   </body>
 </html>

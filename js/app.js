@@ -52,11 +52,33 @@ document.getElementById("save-display-name-btn").addEventListener("click", async
   alert("表示名を保存しました。");
 });
 
+document.getElementById("save-health-profile-btn").addEventListener("click", async () => {
+  const user = auth.currentUser;
+  if (!user) { alert("ログインしてください。"); return; }
+
+  const ref = doc(db, "profiles", activeProfileId, "meta", "healthProfile");
+  try {
+    await setDoc(ref, {
+      allergy: document.getElementById("hp-allergy").value.trim(),
+      sideEffect: document.getElementById("hp-side-effect").value.trim(),
+      asthma: document.getElementById("hp-asthma").value.trim(),
+      smoking: document.getElementById("hp-smoking").value.trim(),
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+    showToast("体質メモを保存しました");
+  } catch (e) {
+    console.error("体質メモの保存に失敗:", e);
+    showToast("保存に失敗しました");
+  }
+});
+
 function switchProfile(profileId) {
   activeProfileId = profileId;
   subscribeMedicines(activeProfileId);
   subscribeExecutions(activeProfileId);
   subscribeTonyo(activeProfileId);
+  subscribeHealthProfile(activeProfileId);
+  updateHealthTargetLabel();
   renderCalendar(currentYear, currentMonth);
 
   // チップの選択表示を更新
@@ -69,6 +91,14 @@ let activeProfileId = null; //現在表示、操作をしているプロフィ�
 let unsubMedicines = null;
 let unsubExecutions = null;
 let unsubTonyo = null;
+let unsubHealth = null;
+let profileNames = {}; // profileId → 表示名（体質メモの対象者名表示に使う）
+
+// 各シートのバナーに「いま操作中のプロフィール（選択中タブの人）」を表示する
+function updateHealthTargetLabel() {
+  const name = profileNames[activeProfileId] ?? "（読み込み中）";
+  document.querySelectorAll(".target-name").forEach(el => { el.textContent = name; });
+}
 
 
 // ログイン状態を見張る（onSnapshotと同じ「見張り」パターン）
@@ -82,7 +112,9 @@ onAuthStateChanged(auth, async (user) => {
     loginBtn.classList.add("hidden");
     logoutBtn.classList.remove("hidden");
     document.getElementById("floating-share-btn").classList.remove("hidden");
+    document.getElementById("floating-health-btn").classList.remove("hidden");
     userName.textContent = user.displayName;
+    document.getElementById("share-owner-name").textContent = user.displayName; // 暫定（後でprofileNamesで上書き）
     document.getElementById("my-share-code").textContent = user.uid;
     subscribeJoinRequests(user.uid);
     subscribeAccessibleProfiles(user.uid);
@@ -111,11 +143,13 @@ onAuthStateChanged(auth, async (user) => {
     subscribeMedicines(activeProfileId);
     subscribeExecutions(activeProfileId);
     subscribeTonyo(activeProfileId);
+    subscribeHealthProfile(activeProfileId);
   } else {
     console.log("未ログイン");
     loginBtn.classList.remove("hidden");
     logoutBtn.classList.add("hidden");
     document.getElementById("floating-share-btn").classList.add("hidden");
+    document.getElementById("floating-health-btn").classList.add("hidden");
     userName.textContent = "";
   }
 });
@@ -316,7 +350,7 @@ function renderCalendar(year, month) {
 
           const tonyoLogs = todaysMeds.filter(m => m.type === "tonyo_log");
           if (tonyoLogs.length > 0) {
-            html += `<div class="time-category-section"><div class="time-category-header" style="color:var(--text-soft);">🚨 症状に合わせて服用した記録（頓用）</div><div class="med-check-list">`;
+            html += `<div class="time-category-section"><div class="time-category-header" style="color:var(--text-soft);">頓用:症状に合わせて使用したお薬の記録</div><div class="med-check-list">`;
             tonyoLogs.forEach(m => {
               html += `
                 <label class="med-check-item" style="background:var(--surface); cursor:default;">
@@ -472,6 +506,24 @@ function subscribeTonyo(uid) {
   });
 }
 
+// 体質メモ（healthProfile）を見張って、入力欄に反映する
+function subscribeHealthProfile(uid) {
+  if (unsubHealth) unsubHealth();
+  const ref = doc(db, "profiles", uid, "meta", "healthProfile");
+
+  unsubHealth = onSnapshot(ref, (docSnap) => {
+    const d = docSnap.exists() ? docSnap.data() : {};
+    document.getElementById("hp-allergy").value = d.allergy ?? "";
+    document.getElementById("hp-side-effect").value = d.sideEffect ?? "";
+    document.getElementById("hp-asthma").value = d.asthma ?? "";
+    document.getElementById("hp-smoking").value = d.smoking ?? "";
+    autoGrow(document.getElementById("hp-allergy"));
+    autoGrow(document.getElementById("hp-side-effect"));
+  }, (err) => {
+    console.error("体質メモの読み込みに失敗:", err);
+  });
+}
+
 // 自分がメンバーに入っているプロフィールを見張り、チップ列に反映
 function subscribeAccessibleProfiles(uid) {
   const q = query(collection(db, "profiles"), where("members", "array-contains", uid));
@@ -493,11 +545,18 @@ function subscribeAccessibleProfiles(uid) {
       chip.className = "profile-chip";
       chip.dataset.profileId = docSnap.id;
       const shownName = d.profileName ?? d.ownerName ?? "名前未設定";
-      chip.textContent = (docSnap.id === uid) ? `自分（${shownName}）` : `${shownName} さん`;
+      profileNames[docSnap.id] = (docSnap.id === uid) ? `自分（${shownName}）` : `${shownName} さん`;
+      chip.textContent = profileNames[docSnap.id];
       if (docSnap.id === activeProfileId) chip.classList.add("is-active");
       chip.addEventListener("click", () => switchProfile(docSnap.id));
       container.appendChild(chip);
     });
+
+    updateHealthTargetLabel(); // 名前が揃ったら対象者表示も更新
+
+    // 共有シートは常にログイン本人のもの
+    const shareEl = document.getElementById("share-owner-name");
+    if (shareEl) shareEl.textContent = profileNames[uid] ?? "";
   });
 }
 // ==========================================================================
@@ -741,6 +800,34 @@ document.getElementById("floating-share-btn").addEventListener("click", () => {
 document.getElementById("close-share-btn").addEventListener("click", () => {
   document.getElementById("share-sheet").classList.add("hidden");
 });
+document.getElementById("floating-health-btn").addEventListener("click", () => {
+  document.getElementById("health-sheet").classList.remove("hidden");
+  updateHealthTargetLabel();
+  autoGrow(document.getElementById("hp-allergy"));
+  autoGrow(document.getElementById("hp-side-effect"));
+});
+document.getElementById("close-health-btn").addEventListener("click", () => {
+  document.getElementById("health-sheet").classList.add("hidden");
+});
+
+// 入力量に応じてtextareaの高さを自動で伸ばす（内部スクロールをなくす）
+function autoGrow(el) {
+  el.style.height = "auto";
+  el.style.height = el.scrollHeight + "px";
+}
+["hp-allergy", "hp-side-effect"].forEach(id => {
+  document.getElementById(id).addEventListener("input", (e) => autoGrow(e.target));
+});
+
+// 保存完了などを画面下に一瞬出すトースト
+let toastTimer = null;
+function showToast(message) {
+  const toast = document.getElementById("toast");
+  document.getElementById("toast-msg").textContent = message;
+  toast.classList.add("is-show");
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove("is-show"), 1600);
+}
 document.getElementById("copy-share-code-btn").addEventListener("click", async () => {
   const code = document.getElementById("my-share-code").textContent;
   if (!code) return;

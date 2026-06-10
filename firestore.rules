@@ -38,6 +38,9 @@ service cloud.firestore {
       match /tonyoRecords/{recId} {
         allow read, write: if isMember(profileId);
       }
+      match /meta/{docId} {
+        allow read, write: if isMember(profileId);
+      }
 
       // 参加申請: 自分の申請は誰でも作れる。閲覧・削除は持ち主だけ
       match /joinRequests/{reqId} {
