@@ -248,6 +248,7 @@ body {
 .icon-success  { -webkit-mask-image: url("../images/icons/success.svg"); mask-image: url("../images/icons/success.svg"); }
 .icon-calendar { -webkit-mask-image: url("../images/icons/calendar.svg"); mask-image: url("../images/icons/calendar.svg"); }
 .icon-health   { -webkit-mask-image: url("../images/icons/heart-rate.svg"); mask-image: url("../images/icons/heart-rate.svg"); }
+.icon-history  { -webkit-mask-image: url("../images/icons/history.svg"); mask-image: url("../images/icons/history.svg"); }
 .profile-chips {
   max-width: 400px;
   margin: 0 auto 4px;
@@ -932,6 +933,72 @@ body {
 #register-bottom-sheet .form-input,
 #register-bottom-sheet .form-select {
   font-size: 16px;
+}
+
+/* 画面3 既往歴・ワクチン接種歴シート */
+#history-sheet .form-input {
+  font-size: 16px;
+}
+#history-sheet textarea.form-input {
+  resize: none;
+  overflow: hidden;
+  min-height: 48px;
+  line-height: 1.5;
+}
+#history-sheet input[type="date"].form-input {
+  -webkit-appearance: none;
+  appearance: none;
+  min-height: 40px;
+}
+.vaccine-card {
+  background: var(--surface);
+  border-radius: 14px;
+  padding: 12px;
+  margin-bottom: 12px;
+  box-shadow: 3px 3px 7px var(--sd), -3px -3px 7px var(--sl);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.vaccine-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.vaccine-row .form-input {
+  flex: 1;
+  min-width: 0;
+}
+.vaccine-elapsed {
+  font-size: 12px;
+  color: var(--text-soft);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.vaccine-elapsed.is-long {
+  color: var(--today);
+}
+.vaccine-delete {
+  align-self: flex-end;
+  background: none;
+  border: none;
+  color: var(--text-faint);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+.vaccine-add-btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 3px 3px 7px var(--sd), -3px -3px 7px var(--sl);
+  margin-bottom: 14px;
 }
 .form-divider {
   border: 0;

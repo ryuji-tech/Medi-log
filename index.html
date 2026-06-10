@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css?v=14"  />
+    <link rel="stylesheet" href="css/style.css?v=16"  />
   </head>
   <body>
     <div id="app">
@@ -54,6 +54,14 @@
             aria-label="体質・受診メモ"
           >
             <span class="icon icon-health"></span>
+          </button>
+
+          <button
+            id="floating-history-btn"
+            class="dock-btn secondary-dock hidden"
+            aria-label="既往歴・ワクチン接種歴"
+          >
+            <span class="icon icon-history"></span>
           </button>
 
           <button
@@ -177,6 +185,61 @@
             </div>
 
             <button id="save-health-profile-btn" class="submit-btn">この内容で保存する</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="history-sheet" class="side-sheet-modal hidden">
+        <div class="sheet-modal-content">
+          <div class="sheet-header">
+            <h3 class="sheet-title"><span class="icon icon-inline icon-history"></span>既往歴・手術歴・ワクチン</h3>
+            <button id="close-history-btn" class="close-x-btn" aria-label="閉じる">×</button>
+          </div>
+
+          <div class="sheet-body">
+            <div class="target-banner">
+              <span class="icon icon-inline icon-history"></span><span class="target-name"></span> さんの既往歴・ワクチン
+            </div>
+            <p class="form-hint">受診時に伝える基礎情報です。空欄のままでも構いません。</p>
+
+            <div class="form-group">
+              <label for="mh-past" class="form-label">既往歴（過去にかかった病気）</label>
+              <textarea id="mh-past" class="form-input" rows="3" placeholder="例：高血圧、2型糖尿病"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="mh-surgery" class="form-label">手術歴</label>
+              <textarea id="mh-surgery" class="form-input" rows="3" placeholder="例：2018年 虫垂炎の手術"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">ワクチン接種歴</label>
+              <div id="vaccine-list"></div>
+              <button id="add-vaccine-btn" class="vaccine-add-btn" type="button">＋ ワクチンを追加</button>
+            </div>
+
+            <button id="save-history-btn" class="submit-btn">この内容で保存する</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="history-gate-modal" class="mini-dialog-overlay hidden">
+        <div class="mini-dialog-box">
+          <h4><span class="icon icon-inline icon-history"></span>既往歴・ワクチンを開きます</h4>
+          <p class="form-hint">
+            既往歴・手術歴・ワクチン接種歴を表示します。よろしいですか？
+          </p>
+          <div class="mini-dialog-actions">
+            <button id="cancel-history-gate-btn" class="btn-action-small">
+              キャンセル
+            </button>
+            <button
+              id="confirm-history-gate-btn"
+              class="btn-action-small"
+              style="background-color:var(--accent); color:#fff; border:none; font-weight:700;"
+            >
+              表示する
+            </button>
           </div>
         </div>
       </div>
@@ -464,6 +527,6 @@
       </div>
     </div>
 
-    <script type="module" src="js/app.js?v=13"></script>
+    <script type="module" src="js/app.js?v=15"></script>
   </body>
 </html>

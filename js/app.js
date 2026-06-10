@@ -78,6 +78,7 @@ function switchProfile(profileId) {
   subscribeExecutions(activeProfileId);
   subscribeTonyo(activeProfileId);
   subscribeHealthProfile(activeProfileId);
+  subscribeMedicalHistory(activeProfileId);
   updateHealthTargetLabel();
   renderCalendar(currentYear, currentMonth);
 
@@ -92,6 +93,8 @@ let unsubMedicines = null;
 let unsubExecutions = null;
 let unsubTonyo = null;
 let unsubHealth = null;
+let unsubHistory = null;
+let vaccineDraft = []; // 既往歴シートのワクチン編集中データ [{name,date,note}]
 let profileNames = {}; // profileId → 表示名（体質メモの対象者名表示に使う）
 
 // 各シートのバナーに「いま操作中のプロフィール（選択中タブの人）」を表示する
@@ -113,6 +116,7 @@ onAuthStateChanged(auth, async (user) => {
     logoutBtn.classList.remove("hidden");
     document.getElementById("floating-share-btn").classList.remove("hidden");
     document.getElementById("floating-health-btn").classList.remove("hidden");
+    document.getElementById("floating-history-btn").classList.remove("hidden");
     userName.textContent = user.displayName;
     document.getElementById("share-owner-name").textContent = user.displayName; // 暫定（後でprofileNamesで上書き）
     document.getElementById("my-share-code").textContent = user.uid;
@@ -144,12 +148,14 @@ onAuthStateChanged(auth, async (user) => {
     subscribeExecutions(activeProfileId);
     subscribeTonyo(activeProfileId);
     subscribeHealthProfile(activeProfileId);
+    subscribeMedicalHistory(activeProfileId);
   } else {
     console.log("未ログイン");
     loginBtn.classList.remove("hidden");
     logoutBtn.classList.add("hidden");
     document.getElementById("floating-share-btn").classList.add("hidden");
     document.getElementById("floating-health-btn").classList.add("hidden");
+    document.getElementById("floating-history-btn").classList.add("hidden");
     userName.textContent = "";
   }
 });
@@ -524,6 +530,103 @@ function subscribeHealthProfile(uid) {
   });
 }
 
+// 接種日から経過年数を計算（5年以上で強調）
+function vaccineElapsed(dateStr) {
+  if (!dateStr) return null;
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return null;
+  const now = new Date();
+  let months = (now.getFullYear() - d.getFullYear()) * 12 + (now.getMonth() - d.getMonth());
+  if (now.getDate() < d.getDate()) months -= 1;
+  if (months < 0) return { text: "接種日が未来です", isLong: false };
+  const y = Math.floor(months / 12);
+  const m = months % 12;
+  let text;
+  if (y === 0 && m === 0) text = "今月接種";
+  else if (y === 0) text = `約${m}ヶ月前`;
+  else if (m === 0) text = `約${y}年前`;
+  else text = `約${y}年${m}ヶ月前`;
+  return { text, isLong: y >= 5 };
+}
+
+// ワクチン一覧を vaccineDraft から描画（フリー記述はDOM生成で安全に差し込む）
+function renderVaccines() {
+  const list = document.getElementById("vaccine-list");
+  list.textContent = "";
+
+  vaccineDraft.forEach((v, idx) => {
+    const card = document.createElement("div");
+    card.className = "vaccine-card";
+
+    const nameInput = document.createElement("input");
+    nameInput.type = "text";
+    nameInput.className = "form-input";
+    nameInput.placeholder = "ワクチン名（例：破傷風）";
+    nameInput.value = v.name ?? "";
+    nameInput.addEventListener("input", (e) => { vaccineDraft[idx].name = e.target.value; });
+
+    const row = document.createElement("div");
+    row.className = "vaccine-row";
+
+    const dateInput = document.createElement("input");
+    dateInput.type = "date";
+    dateInput.className = "form-input";
+    dateInput.value = v.date ?? "";
+
+    const elapsed = document.createElement("span");
+    elapsed.className = "vaccine-elapsed";
+    const setElapsed = () => {
+      const r = vaccineElapsed(dateInput.value);
+      elapsed.textContent = r ? r.text : "";
+      elapsed.classList.toggle("is-long", !!(r && r.isLong));
+    };
+    setElapsed();
+    dateInput.addEventListener("input", (e) => { vaccineDraft[idx].date = e.target.value; setElapsed(); });
+
+    row.appendChild(dateInput);
+    row.appendChild(elapsed);
+
+    const noteInput = document.createElement("input");
+    noteInput.type = "text";
+    noteInput.className = "form-input";
+    noteInput.placeholder = "メモ（任意）";
+    noteInput.value = v.note ?? "";
+    noteInput.addEventListener("input", (e) => { vaccineDraft[idx].note = e.target.value; });
+
+    const del = document.createElement("button");
+    del.type = "button";
+    del.className = "vaccine-delete";
+    del.textContent = "🗑️ この行を削除";
+    del.addEventListener("click", () => { vaccineDraft.splice(idx, 1); renderVaccines(); });
+
+    card.appendChild(nameInput);
+    card.appendChild(row);
+    card.appendChild(noteInput);
+    card.appendChild(del);
+    list.appendChild(card);
+  });
+}
+
+// 既往歴・手術歴・ワクチン（medicalHistory）を見張って反映する
+function subscribeMedicalHistory(uid) {
+  if (unsubHistory) unsubHistory();
+  const ref = doc(db, "profiles", uid, "meta", "medicalHistory");
+
+  unsubHistory = onSnapshot(ref, (docSnap) => {
+    const d = docSnap.exists() ? docSnap.data() : {};
+    document.getElementById("mh-past").value = d.pastHistory ?? "";
+    document.getElementById("mh-surgery").value = d.surgery ?? "";
+    vaccineDraft = Array.isArray(d.vaccines)
+      ? d.vaccines.map(v => ({ name: v.name ?? "", date: v.date ?? "", note: v.note ?? "" }))
+      : [];
+    renderVaccines();
+    autoGrow(document.getElementById("mh-past"));
+    autoGrow(document.getElementById("mh-surgery"));
+  }, (err) => {
+    console.error("既往歴の読み込みに失敗:", err);
+  });
+}
+
 // 自分がメンバーに入っているプロフィールを見張り、チップ列に反映
 function subscribeAccessibleProfiles(uid) {
   const q = query(collection(db, "profiles"), where("members", "array-contains", uid));
@@ -810,12 +913,60 @@ document.getElementById("close-health-btn").addEventListener("click", () => {
   document.getElementById("health-sheet").classList.add("hidden");
 });
 
+// 既往歴・ワクチンは開く前にワンクッション確認（パスワードロックはしない）
+// ※ confirm()はBrave等でブロックされるため、アプリ内モーダルで確認する
+document.getElementById("floating-history-btn").addEventListener("click", () => {
+  document.getElementById("history-gate-modal").classList.remove("hidden");
+});
+document.getElementById("cancel-history-gate-btn").addEventListener("click", () => {
+  document.getElementById("history-gate-modal").classList.add("hidden");
+});
+document.getElementById("confirm-history-gate-btn").addEventListener("click", () => {
+  document.getElementById("history-gate-modal").classList.add("hidden");
+  document.getElementById("history-sheet").classList.remove("hidden");
+  updateHealthTargetLabel();
+  autoGrow(document.getElementById("mh-past"));
+  autoGrow(document.getElementById("mh-surgery"));
+});
+document.getElementById("close-history-btn").addEventListener("click", () => {
+  document.getElementById("history-sheet").classList.add("hidden");
+});
+
+document.getElementById("add-vaccine-btn").addEventListener("click", () => {
+  vaccineDraft.push({ name: "", date: "", note: "" });
+  renderVaccines();
+});
+
+document.getElementById("save-history-btn").addEventListener("click", async () => {
+  const user = auth.currentUser;
+  if (!user) { alert("ログインしてください。"); return; }
+
+  // 全項目空のワクチン行は保存しない
+  const cleanVaccines = vaccineDraft
+    .map(v => ({ name: (v.name || "").trim(), date: (v.date || "").trim(), note: (v.note || "").trim() }))
+    .filter(v => v.name || v.date || v.note);
+
+  const ref = doc(db, "profiles", activeProfileId, "meta", "medicalHistory");
+  try {
+    await setDoc(ref, {
+      pastHistory: document.getElementById("mh-past").value.trim(),
+      surgery: document.getElementById("mh-surgery").value.trim(),
+      vaccines: cleanVaccines,
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+    showToast("既往歴・ワクチンを保存しました");
+  } catch (e) {
+    console.error("既往歴の保存に失敗:", e);
+    showToast("保存に失敗しました");
+  }
+});
+
 // 入力量に応じてtextareaの高さを自動で伸ばす（内部スクロールをなくす）
 function autoGrow(el) {
   el.style.height = "auto";
   el.style.height = el.scrollHeight + "px";
 }
-["hp-allergy", "hp-side-effect"].forEach(id => {
+["hp-allergy", "hp-side-effect", "mh-past", "mh-surgery"].forEach(id => {
   document.getElementById(id).addEventListener("input", (e) => autoGrow(e.target));
 });
 
