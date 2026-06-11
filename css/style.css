@@ -77,7 +77,7 @@ body {
 }
 
 .app-title {
-  font-family: var(--font-round);
+  font-family: 'Zen Maru Gothic', sans-serif;
   font-size: 22px;
   font-weight: 700;
   color: var(--text);
