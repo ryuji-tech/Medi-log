@@ -2,6 +2,13 @@
 
 Medi-log(メディログ)
 
+**デモ（2バージョン併存）**
+
+- 🔵 Firebase版（現行・本命）: https://medi-log-25f73.web.app/
+- ⚪ localStorage版（旧版デモ）: https://ryuji-tech.github.io/Medi-log/
+
+Firebase版はアカウント認証・データベース管理に対応した現行版です。localStorage版はデータベースを使わない初期版で、操作感を試せるデモとして残しています。
+
 ※旧版（localStorage版Medi-log）のREADMEはREADME.localstorageとして別ファイル移行しました。
 
 **（2）制作アプリの説明（40文字程度）**
