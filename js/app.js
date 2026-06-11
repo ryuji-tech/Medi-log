@@ -185,6 +185,42 @@ let registeredMedicines = [];
 let executionRecords = []; // 💡 定期薬の服薬チェック実績を保持する配列を追加
 let tonyoLog = []; // 頓用の服用記録（Firestoreから読み込む）
 
+// 用法プリセット（開発者管理マスタ）。slots=カレンダーで点灯する時間帯。回数＝スロット数。
+// ※起床時/食前/食間は時間帯としては朝昼夕に対応づけ、ラベルで細かい指示を表す。
+const USAGE_PRESETS = {
+  "1": [
+    { label: "朝食後", slots: ["morning"] },
+    { label: "昼食後", slots: ["noon"] },
+    { label: "夕食後", slots: ["evening"] },
+    { label: "寝る前", slots: ["bedtime"] },
+    { label: "起床時", slots: ["morning"] },
+    { label: "朝食前", slots: ["morning"] },
+    { label: "夕食前", slots: ["evening"] },
+  ],
+  "2": [
+    { label: "朝・夕食後", slots: ["morning", "evening"] },
+    { label: "朝・夕食前", slots: ["morning", "evening"] },
+    { label: "朝食後・寝る前", slots: ["morning", "bedtime"] },
+    { label: "夕食後・寝る前", slots: ["evening", "bedtime"] },
+  ],
+  "3": [
+    { label: "朝・昼・夕食後", slots: ["morning", "noon", "evening"] },
+    { label: "朝・昼・夕食前", slots: ["morning", "noon", "evening"] },
+    { label: "毎食間", slots: ["morning", "noon", "evening"] },
+    { label: "朝・夕食後・寝る前", slots: ["morning", "evening", "bedtime"] },
+  ],
+  "4": [
+    { label: "朝・昼・夕食後＋寝る前", slots: ["morning", "noon", "evening", "bedtime"] },
+    { label: "朝・昼・夕食前＋寝る前", slots: ["morning", "noon", "evening", "bedtime"] },
+  ],
+  "tonyo": [
+    { label: "頭痛・痛むとき", slots: [] },
+    { label: "発熱時", slots: [] },
+    { label: "症状があるとき", slots: [] },
+    { label: "発作時", slots: [] },
+  ],
+};
+
 
 // ==========================================================================
 // 2. 厳密な服薬スケジュール判定エンジン
@@ -798,7 +834,17 @@ document.getElementById("quote-medicine-select").addEventListener("change", (e) 
   if (target.periodType === "weekly") {
     scheduleWeeklyArea.querySelectorAll('input[type="checkbox"]').forEach(cb => { cb.checked = target.targetDays.includes(parseInt(cb.value)); });
   } else if (target.periodType === "interval") { document.getElementById("med-interval-days").value = target.intervalDays; }
-  document.getElementById("med-dosage-uniform").value = target.dosages.morning || "1";
+
+  // 用法プリセットを元薬のラベルに合わせて選び直す
+  const qpresets = USAGE_PRESETS[target.frequency] || [];
+  const qidx = qpresets.findIndex(p => p.label === target.detailUsageText);
+  if (qidx >= 0) detailUsageSelect.value = String(qidx);
+
+  // 用量は点灯しているスロットの値から拾う（寝る前のみ等で朝が0でも対応）
+  const firstDose = ["morning", "noon", "evening", "bedtime"]
+    .map(s => target.dosages?.[s])
+    .find(v => v && v !== "0") || "1";
+  document.getElementById("med-dosage-uniform").value = firstDose;
 });
 
 // 💡 【整流】登録実行処理（配列へのすべてのデータプッシュ完了後に正しく保存を実行）
@@ -818,14 +864,17 @@ document.getElementById("submit-register-btn").addEventListener("click", async (
     scheduleWeeklyArea.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => targetDays.push(parseInt(cb.value)));
   } else if (periodType === "interval") { intervalDays = parseInt(document.getElementById("med-interval-days").value) || 2; }
 
-  let detailUsageText = detailUsageSelect.options[detailUsageSelect.selectedIndex]?.text || "通常用法";
   let categories = { morning: false, noon: false, evening: false, bedtime: false };
   let dosages = { morning: "0", noon: "0", evening: "0", bedtime: "0" };
   const uniformAmount = document.getElementById("med-dosage-uniform").value || "1";
 
-  if (frequency === "3") { categories.morning = true; categories.noon = true; categories.evening = true; dosages.morning = uniformAmount; dosages.noon = uniformAmount; dosages.evening = uniformAmount; }
-  else if (frequency === "2") { categories.morning = true; categories.evening = true; dosages.morning = uniformAmount; dosages.evening = uniformAmount; }
-  else if (frequency === "1") { categories.morning = true; dosages.morning = uniformAmount; }
+  // 選択中のプリセットから、点灯する時間帯（スロット）と用法ラベルを決める
+  const presets = USAGE_PRESETS[frequency] || [];
+  const preset = presets[parseInt(detailUsageSelect.value)] || presets[0];
+  let detailUsageText = preset ? preset.label : "通常用法";
+  if (preset && frequency !== "tonyo") {
+    preset.slots.forEach(slot => { categories[slot] = true; dosages[slot] = uniformAmount; });
+  }
 
   const category = document.querySelector('input[name="med-category"]:checked').value;
 
@@ -1048,16 +1097,16 @@ document.querySelectorAll('input[name="med-period-type"]').forEach(r => {
 frequencySelect.addEventListener("change", (e) => {
   const v = e.target.value; detailUsageGroup.classList.add("hidden"); dosageGroup.classList.add("hidden"); scheduleGroup.classList.remove("hidden"); tonyoTimeGroup.classList.add("hidden"); detailUsageSelect.innerHTML = "";
   if (!v) return;
-  let opts = [];
-  if (v === "3") opts = [{ text: "朝・昼・夕食後" }];
-  else if (v === "2") opts = [{ text: "朝・夕食後" }];
-  else if (v === "1") opts = [{ text: "朝食後" }];
-  else if (v === "tonyo") opts = [{ text: "頭痛・痛むとき" }];
-  
-  if (opts.length > 0) {
-    opts.forEach(o => { const el = document.createElement("option"); el.textContent = o.text; detailUsageSelect.appendChild(el); });
-    detailUsageGroup.classList.remove("hidden");
-  }
+
+  const presets = USAGE_PRESETS[v] || [];
+  presets.forEach((p, i) => {
+    const el = document.createElement("option");
+    el.value = i;                 // 選択値＝マスタ配列のインデックス
+    el.textContent = p.label;
+    detailUsageSelect.appendChild(el);
+  });
+  if (presets.length > 0) detailUsageGroup.classList.remove("hidden");
+
   dosageGroup.classList.remove("hidden");
   if (v === "tonyo") { scheduleGroup.classList.add("hidden"); tonyoTimeGroup.classList.remove("hidden"); }
 });
