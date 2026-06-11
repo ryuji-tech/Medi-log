@@ -123,7 +123,7 @@ body {
   gap: 8px; margin-bottom: 8px;
 }
 .cal__dow {
-  text-align: center; font-size: 13px; font-weight: 700;
+  text-align: center; font-size: 14px; font-weight: 700;
   color: var(--text-soft); padding-bottom: 6px;
 }
 .cal__dow.sat { color: var(--weekend-sat); }
@@ -133,7 +133,7 @@ body {
   aspect-ratio: 1 / 1; border-radius: 14px;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  font-size: 17px; font-weight: 700; color: var(--text);
+  font-size: 18px; font-weight: 700; color: var(--text);
   position: relative; cursor: pointer;
   background: var(--surface);
   box-shadow: 4px 4px 9px var(--sd), -4px -4px 9px var(--sl);
@@ -418,7 +418,7 @@ body {
 
 .accordion-title {
   margin: 0 0 16px 0;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--text);
   border-left: 3px solid var(--accent);
@@ -440,7 +440,7 @@ body {
   margin-bottom: 0;
 }
 .time-category-header {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--text);
   margin-bottom: 8px;
@@ -495,12 +495,12 @@ body {
   flex-direction: column;
 }
 .med-check-text {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 500;
   color: var(--text);
 }
 .med-check-subtext {
-  font-size: 11px;
+  font-size: 13px;
   color: var(--text-soft);
   margin-top: 2px;
 }
@@ -511,10 +511,12 @@ body {
 .floating-actions-container {
   position: absolute;
   bottom: 24px;
-  right: 24px;
+  left: 18px;
+  right: 18px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between; /* 横幅に対して等間隔（アイコン増減に追従） */
+  gap: 8px;
   z-index: 90;
 }
 
@@ -609,7 +611,7 @@ body {
   border-bottom: 1px solid var(--line);
 }
 .sheet-title {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--text);
   margin: 0;
@@ -657,12 +659,12 @@ body {
   align-items: flex-start;
 }
 .med-master-card-title {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 700;
   color: var(--text);
 }
 .med-master-card-meta {
-  font-size: 11px;
+  font-size: 13px;
   color: var(--accent);
   background: var(--bg);
   padding: 4px 8px;
@@ -679,7 +681,7 @@ body {
 }
 .btn-action-small {
   padding: 8px 14px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   font-family: var(--font-round);
   border: none;
@@ -810,7 +812,7 @@ body {
 .form-select {
   width: 100%;
   padding: 12px 14px;
-  font-size: 14px;
+  font-size: 16px;
   border: none;
   border-radius: 12px;
   background: var(--bg);
