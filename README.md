@@ -4,10 +4,12 @@ Medi-log(メディログ)
 
 **デモ（2バージョン併存）**
 
-- 🔵 Firebase版（現行・本命）: https://medi-log-25f73.web.app/
-- ⚪ localStorage版（旧版デモ）: https://ryuji-tech.github.io/Medi-log/
+- 🔵 Firebase版（現行・本命）: https://medi-log-25f73.web.app/ <br>
+     Firebase版はGoogleアカウントによるログインが前提です。未ログイン状態ではログイン導線のみ表示され、薬や服薬実績などのデータ表示・保存・同期、友達追加（共有）、健康情報・既往歴/予防接種歴の管理といった機能は利用できません。ログイン後に自分のプロフィールが自動作成され、各データが同期されます。
+- ⚪ localStorage版（旧版デモ）: https://ryuji-tech.github.io/Medi-log/ <br>
+     現行版はアカウント認証・データベース管理に対応しています。localStorage版はデータベースを使わない初期版で、操作感を試せるデモとして残しています。
 
-Firebase版はアカウント認証・データベース管理に対応した現行版です。localStorage版はデータベースを使わない初期版で、操作感を試せるデモとして残しています。
+
 
 ※旧版（localStorage版Medi-log）のREADMEはREADME.localstorageとして別ファイル移行しました。
 
